@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>صفحة وصل - Link-in-bio</title>
+  <style>
+    :root{
+      --bg1: #0f172a; /* dark */
+      --bg2: #0b2545; /* accent */
+      --card:#0b1220;
+      --accent:linear-gradient(135deg,#ff7ab6 0%,#7a7bff 50%,#00d4ff 100%);
+      --glass: rgba(255,255,255,0.04);
+      --muted: rgba(255,255,255,0.6);
+      --radius:18px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(122,123,255,0.12), transparent),
+                  radial-gradient(900px 400px at 90% 90%, rgba(0,212,255,0.06), transparent),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 18px;
+    }
+    .card{
+      width:100%;
+      max-width:480px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      padding:26px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px) saturate(120%);
+    }
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .avatar{
+      width:86px;height:86px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.06);
+      flex:0 0 86px;background:linear-gradient(135deg,#213a5a,#1b2b4a);
+      display:grid;place-items:center;font-weight:700;font-size:28px;color:#fff;
+    }
+    .profile-info{flex:1;min-width:0}
+    .name{font-size:20px;font-weight:700;margin:0 0 4px 0}
+    .bio{font-size:13px;color:var(--muted);margin:0}
+
+    .buttons{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+    .btn{
+      display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;text-decoration:none;color:inherit;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      transition:transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+    }
+    .btn:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(2,6,23,0.6);}
+    .btn .label{flex:1;text-align:right;font-weight:600}
+    .btn .icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--glass);font-size:18px}
+    .small{font-size:12px;color:var(--muted)}
+
+    .controls{display:flex;gap:8px;align-items:center;margin-top:14px}
+    .control-btn{padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+
+    .footer{margin-top:18px;text-align:center;color:var(--muted);font-size:12px}
+
+    /* responsive */
+    @media (max-width:420px){.avatar{width:72px;height:72px}.card{padding:18px}}
+
+    /* little badge */
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);font-size:12px}
+  </style>
+</head>
+<body>
+  <main class="card" id="card">
+    <div class="top">
+      <div class="avatar" id="avatar">FD</div>
+      <div class="profile-info">
+        <h1 class="name" id="displayName">الاسم هنا</h1>
+        <p class="bio" id="bioText">سطر تعريفي قصير يعبر عنك — ضع هنا وصفًا مختصرًا أو وسوم.</p>
+      </div>
+    </div>
+
+    <div class="buttons" id="links"></div>
+
+    <div class="controls">
+      <button class="control-btn" id="copyLink">نسخ رابط</button>
+      <button class="control-btn" id="shareBtn">مشاركة</button>
+      <div style="flex:1"></div>
+      <span class="badge" id="visits">زيارات: 0</span>
+    </div>
+
+    <div class="footer">تصميم أنيق لـ <strong>Link-in-bio</strong> — قم بتحرير المتغيرات داخل الكود لتخصيص.</div>
+  </main>
+
+  <script>
+    // ====== إعدادات سريعة: عدلها هنا ======
+    const profile = {
+      name: 'اسمك هنا',
+      bio: 'مطور ويب • صانع محتوى • أحب التكنولوجيا',
+      avatarText: 'FD', // يظهر إن لم يكن هناك صورة
+      themeAccent: ['#ff7ab6','#7a7bff','#00d4ff'],
+      links:[
+        {label:'الموقع الرسمي', url:'https://example.com', icon:'🌐'},
+        {label:'قناة التيليجرام', url:'https://t.me/yourchannel', icon:'💬'},
+        {label:'حساب انستغرام', url:'https://instagram.com/your', icon:'📷'},
+        {label:'متجر', url:'https://store.example.com', icon:'🛒'},
+      ]
+    }
+    // ======================================
+
+    // Render profile
+    document.getElementById('displayName').textContent = profile.name
+    document.getElementById('bioText').textContent = profile.bio
+    document.getElementById('avatar').textContent = profile.avatarText
+
+    // generate buttons
+    const linksEl = document.getElementById('links')
+    let visitCount = 0
+    const counts = {}
+
+    function createButton(link){
+      const a = document.createElement('a')
+      a.className = 'btn'
+      a.href = link.url
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+
+      const icon = document.createElement('div')
+      icon.className = 'icon'
+      icon.innerHTML = link.icon || '🔗'
+
+      const label = document.createElement('div')
+      label.className = 'label'
+      label.textContent = link.label
+
+      const small = document.createElement('div')
+      small.className = 'small'
+      small.textContent = link.subtitle || ''
+
+      a.appendChild(icon)
+      const right = document.createElement('div')
+      right.style.display='flex'
+      right.style.flexDirection='column'
+      right.style.alignItems='flex-end'
+      right.style.gap='6px'
+      right.appendChild(label)
+      right.appendChild(small)
+      a.appendChild(right)
+
+      // Track clicks locally (you can replace with server API)
+      a.addEventListener('click', ()=>{
+        counts[link.url] = (counts[link.url]||0)+1
+        visitCount++
+        document.getElementById('visits').textContent = 'زيارات: '+visitCount
+        // optional: save to localStorage so refresh persists
+        try{ localStorage.setItem('link_counts', JSON.stringify(counts)); localStorage.setItem('link_visits', visitCount)}catch(e){}
+      })
+
+      return a
+    }
+
+    function loadLinks(){
+      linksEl.innerHTML=''
+      profile.links.forEach(l=>linksEl.appendChild(createButton(l)))
+
+      // restore counts
+      try{
+        const saved = JSON.parse(localStorage.getItem('link_counts')||'{}')
+        const savedVisits = parseInt(localStorage.getItem('link_visits')||'0')||0
+        Object.assign(counts,saved)
+        visitCount = savedVisits
+        document.getElementById('visits').textContent = 'زيارات: '+visitCount
+      }catch(e){}
+    }
+
+    loadLinks()
+
+    // copy current page link
+    document.getElementById('copyLink').addEventListener('click', async()=>{
+      try{
+        await navigator.clipboard.writeText(window.location.href)
+        alert('تم نسخ الرابط')
+      }catch(e){
+        prompt('انسخ الرابط يدوياً:', window.location.href)
+      }
+    })
+
+    // share
+    document.getElementById('shareBtn').addEventListener('click', async()=>{
+      if(navigator.share){
+        try{ await navigator.share({title:profile.name, text:profile.bio, url:window.location.href}) }catch(e){}
+      }else{
+        alert('ميزة المشاركة غير مدعومة في متصفحك — استخدم "نسخ رابط" بدلاً من ذلك.')
+      }
+    })
+
+    // small keyboard shortcut to open edit dialog (for testing)
+    window.addEventListener('keydown', (e)=>{ if(e.key==='e' && (e.ctrlKey||e.metaKey)){ editQuick() } })
+
+    function editQuick(){
+      const newName = prompt('الاسم:', profile.name)
+      if(!newName) return
+      profile.name=newName
+      document.getElementById('displayName').textContent = profile.name
+    }
+
+    // Optional: you can load profile JSON from /profile.json using fetch()
+    // or connect clicks to your analytics server by replacing the click handler above.
+
+  </script>
+</body>
+</html>
